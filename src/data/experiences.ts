@@ -1,0 +1,141 @@
+import hikeAdamsPeak from "../assets/experiences/hike_adams_peak.jpg";
+import paraglideElla from "../assets/experiences/paraglide_ella.jpg";
+import sigiriyaLionRock from "../assets/experiences/sigiriya_lion_rock.jpg";
+import pinnawalaOrphanage from "../assets/experiences/pinnawala_orphanage.jpg";
+import cookingClass from "../assets/experiences/cooking_class.jpg";
+import batikWorkshop from "../assets/experiences/batik_workshop.jpg";
+import ayurvedaRetreat from "../assets/experiences/ayurveda_retreat.jpg";
+import herbalGarden from "../assets/experiences/herbal_garden.jpg";
+import streetFoodTour from "../assets/experiences/street_food_tour.jpg";
+import teaFactory from "../assets/experiences/tea_factory.jpg";
+import elephantSafari from "../assets/experiences/elephant_safari.jpg";
+import leopardTracking from "../assets/experiences/leopard_tracking.jpg";
+import snorkelling from "../assets/experiences/snorkelling.jpg";
+import whaleWatching from "../assets/experiences/whale_watching.jpg";
+import surfLessons from "../assets/experiences/surf_lessons.jpg";
+
+export const experienceCategories = [
+  "Adventure",
+  "Culture",
+  "Wellness",
+  "Food",
+  "Wildlife",
+  "Water",
+] as const;
+
+export type ExperienceCategory = (typeof experienceCategories)[number];
+
+export type Experience = {
+  name: string;
+  category: ExperienceCategory;
+  image: string;
+  description: string;
+};
+
+export const experiences: Experience[] = [
+  {
+    name: "Hike Adam's Peak",
+    category: "Adventure",
+    image: hikeAdamsPeak,
+    description:
+      "Night climb to the sacred summit for sunrise, a pilgrimage and physical challenge in one.",
+  },
+  {
+    name: "Paraglide Over Ella",
+    category: "Adventure",
+    image: paraglideElla,
+    description:
+      "Soar above tea estates and waterfalls with a tandem pilot from Ella Rock launch site.",
+  },
+  {
+    name: "Sigiriya Lion Rock",
+    category: "Culture",
+    image: sigiriyaLionRock,
+    description:
+      "Climb the ancient rock fortress and see the world's oldest surviving frescoes.",
+  },
+  {
+    name: "Pinnawala Elephant Orphanage",
+    category: "Culture",
+    image: pinnawalaOrphanage,
+    description:
+      "Watch baby elephants bathe in the river and learn about conservation efforts.",
+  },
+  {
+    name: "Sri Lankan Cooking Class",
+    category: "Culture",
+    image: cookingClass,
+    description:
+      "Learn to make kottu, dhal curry and hoppers with a local family in their home kitchen.",
+  },
+  {
+    name: "Batik & Craft Workshop",
+    category: "Culture",
+    image: batikWorkshop,
+    description:
+      "Create your own traditional batik fabric in a small artisan workshop in Kandy.",
+  },
+  {
+    name: "Ayurveda Retreat",
+    category: "Wellness",
+    image: ayurvedaRetreat,
+    description:
+      "Authentic Ayurvedic treatments, oil massages, herbal baths and Panchakarma therapies.",
+  },
+  {
+    name: "Herbal Garden Walk",
+    category: "Wellness",
+    image: herbalGarden,
+    description:
+      "Guided walk through a traditional Ayurvedic garden learning plant medicine.",
+  },
+  {
+    name: "Street Food Tour, Colombo",
+    category: "Food",
+    image: streetFoodTour,
+    description:
+      "Kottu, hoppers, isso wade and wood apple juice through the lanes of Pettah Market.",
+  },
+  {
+    name: "Tea Factory Visit",
+    category: "Food",
+    image: teaFactory,
+    description:
+      "Tour a working tea factory in Nuwara Eliya and taste freshly plucked single-estate teas.",
+  },
+  {
+    name: "Elephant Safari, Udawalawe",
+    category: "Wildlife",
+    image: elephantSafari,
+    description:
+      "Watch wild elephants in their natural habitat, herds of 50+ are common.",
+  },
+  {
+    name: "Leopard Tracking, Yala",
+    category: "Wildlife",
+    image: leopardTracking,
+    description:
+      "Dawn jeep safari in Yala Block 1, the world's highest density of leopards.",
+  },
+  {
+    name: "Snorkelling, Pigeon Island",
+    category: "Water",
+    image: snorkelling,
+    description:
+      "Sri Lanka's only coral sanctuary, home to blacktip reef sharks and sea turtles.",
+  },
+  {
+    name: "Blue Whale Watching",
+    category: "Water",
+    image: whaleWatching,
+    description:
+      "Board a small boat off Mirissa for a chance to see the largest animals on earth.",
+  },
+  {
+    name: "Surf Lessons, Arugam Bay",
+    category: "Water",
+    image: surfLessons,
+    description:
+      "World-ranked surf point perfect for beginners and advanced surfers alike.",
+  },
+];
