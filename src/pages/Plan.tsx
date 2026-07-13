@@ -429,6 +429,7 @@ export default function Plan() {
   const [children, setChildren] = useState(0);
   const [teens, setTeens] = useState(0);
   const [pets, setPets] = useState<"No" | "Yes">("No");
+  const [petDetails, setPetDetails] = useState("");
 
   const [destinations, setDestinations] = useState<string[]>([]);
   const [otherDestinations, setOtherDestinations] = useState("");
@@ -503,6 +504,7 @@ export default function Plan() {
       line("Children (3-12)", String(children)),
       line("Teens (13-17)", String(teens)),
       line("Travelling with Pets", pets),
+      ...(pets === "Yes" ? [line("Pet Details", petDetails)] : []),
       "",
       "3. DESTINATIONS",
       "-".repeat(40),
@@ -573,6 +575,7 @@ export default function Plan() {
       Children: String(children),
       Teens: String(teens),
       "Travelling with Pets": pets,
+      "Pet Details": pets === "Yes" ? orNone(petDetails) : "N/A",
       Destinations: orNone(destinations.join(", ")),
       "Other Destinations": orNone(otherDestinations),
       "Hotel Rating": orNone(hotelRating),
@@ -835,6 +838,21 @@ export default function Plan() {
                           onChange={() => setPets("Yes")}
                         />
                       </div>
+                      {pets === "Yes" && (
+                        <label className="mt-3 block">
+                          <span className="mb-1.5 block text-sm font-semibold text-forest-900">
+                            Tell us about your pet(s)
+                          </span>
+                          <textarea
+                            rows={2}
+                            autoFocus
+                            placeholder="e.g. 1 small dog, 12kg, house-trained, needs a pet-friendly villa..."
+                            value={petDetails}
+                            onChange={(e) => setPetDetails(e.target.value)}
+                            className="w-full resize-none rounded-lg border border-forest-900/15 px-4 py-2.5 text-sm text-forest-950 placeholder:text-forest-950/35 outline-none transition focus:border-gold-400"
+                          />
+                        </label>
+                      )}
                     </div>
                   </SectionCard>
 
