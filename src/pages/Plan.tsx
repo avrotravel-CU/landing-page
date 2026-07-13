@@ -452,14 +452,6 @@ export default function Plan() {
       agreed
   );
 
-  function encodeFormData(data: Record<string, string>): string {
-    return Object.keys(data)
-      .map(
-        (key) => encodeURIComponent(key) + "=" + encodeURIComponent(data[key])
-      )
-      .join("&");
-  }
-
   function orNone(value: string): string {
     return value.trim() ? value : "None specified";
   }
@@ -544,8 +536,6 @@ export default function Plan() {
     setSubmitError(false);
 
     const payload: Record<string, string> = {
-      "form-name": "trip-request",
-      "bot-field": "",
       "First Name": firstName,
       "Last Name": lastName,
       "Email Address": email,
@@ -583,10 +573,10 @@ export default function Plan() {
     };
 
     try {
-      const response = await fetch("/", {
+      const response = await fetch("/api/submit-trip", {
         method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: encodeFormData(payload),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
       });
       if (!response.ok) throw new Error(`Status ${response.status}`);
       setSubmitted(true);
