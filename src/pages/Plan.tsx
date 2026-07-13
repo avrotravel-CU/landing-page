@@ -437,6 +437,8 @@ export default function Plan() {
   const [dreamTrip, setDreamTrip] = useState("");
   const [agreed, setAgreed] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState(false);
 
   const canSubmit = Boolean(
     firstName.trim() &&
@@ -450,9 +452,149 @@ export default function Plan() {
       agreed
   );
 
-  function handleSubmit(e: FormEvent) {
+  function encodeFormData(data: Record<string, string>): string {
+    return Object.keys(data)
+      .map(
+        (key) => encodeURIComponent(key) + "=" + encodeURIComponent(data[key])
+      )
+      .join("&");
+  }
+
+  function orNone(value: string): string {
+    return value.trim() ? value : "None specified";
+  }
+
+  function buildSummary(): string {
+    const line = (label: string, value: string) => `${label}: ${orNone(value)}`;
+    return [
+      "SRI LANKA TOUR REQUEST",
+      "=".repeat(40),
+      "",
+      "1. CONTACT INFORMATION",
+      "-".repeat(40),
+      line("Name", `${firstName} ${lastName}`.trim()),
+      line("Email", email),
+      line("Phone / WhatsApp", phone),
+      line("Country of Residence", country),
+      line("Preferred Contact Method", contactMethod),
+      "",
+      "2. TRIP DETAILS",
+      "-".repeat(40),
+      line("Arrival Date", arrival),
+      line("Departure Date", departure),
+      line("Number of Days", days),
+      line("Adults", adults),
+      line("Infants (0-2)", String(infants)),
+      line("Children (3-12)", String(children)),
+      line("Teens (13-17)", String(teens)),
+      line("Travelling with Pets", pets),
+      "",
+      "3. DESTINATIONS",
+      "-".repeat(40),
+      line("Selected Destinations", destinations.join(", ")),
+      line("Other Destinations", otherDestinations),
+      "",
+      "4. ACCOMMODATION PREFERENCES",
+      "-".repeat(40),
+      line("Preferred Hotel Rating", hotelRating),
+      line("Preferred Room Type(s)", roomTypes.join(", ")),
+      "",
+      "5. ACTIVITIES OF INTEREST",
+      "-".repeat(40),
+      line("Activities", activities.join(", ")),
+      line("Other Activities", otherActivities),
+      "",
+      "6. DRIVER & GUIDE PREFERENCES",
+      "-".repeat(40),
+      line("Preferred Language", language),
+      line("Driver Gender Preference", driverGender),
+      line("Preferred Driver Age", driverAge),
+      line("LGBTQ Friendly Driver Required?", lgbtqFriendly),
+      line("Need Child Friendly Driver?", childFriendly),
+      "",
+      "7. FOOD & DIETARY PREFERENCES",
+      "-".repeat(40),
+      line("Food Preferences", foodPrefs.join(", ")),
+      line("Spice Level", spiceLevel),
+      line("Allergies & Medical Concerns", allergies),
+      "",
+      "8. CULTURAL & RELIGIOUS PREFERENCES",
+      "-".repeat(40),
+      line("Preferences Flagged", culturalPrefs.join(", ")),
+      line("Details", culturalDetails),
+      "",
+      "9. BUDGET",
+      "-".repeat(40),
+      line("Budget (per person, per day)", budget),
+      "",
+      "10. DREAM TRIP",
+      "-".repeat(40),
+      line("Expectations / Notes", dreamTrip),
+      "",
+      "=".repeat(40),
+      line("Terms & Privacy Policy Agreed", agreed ? "Yes" : "No"),
+    ].join("\n");
+  }
+
+  async function handleSubmit(e: FormEvent) {
     e.preventDefault();
-    if (canSubmit) setSubmitted(true);
+    if (!canSubmit || submitting) return;
+
+    setSubmitting(true);
+    setSubmitError(false);
+
+    const payload: Record<string, string> = {
+      "form-name": "trip-request",
+      "bot-field": "",
+      "First Name": firstName,
+      "Last Name": lastName,
+      "Email Address": email,
+      "Phone / WhatsApp": orNone(phone),
+      "Country of Residence": country,
+      "Preferred Contact Method": contactMethod,
+      "Arrival Date": arrival,
+      "Departure Date": departure,
+      "Number of Days": days,
+      Adults: adults,
+      Infants: String(infants),
+      Children: String(children),
+      Teens: String(teens),
+      "Travelling with Pets": pets,
+      Destinations: orNone(destinations.join(", ")),
+      "Other Destinations": orNone(otherDestinations),
+      "Hotel Rating": orNone(hotelRating),
+      "Room Types": orNone(roomTypes.join(", ")),
+      Activities: orNone(activities.join(", ")),
+      "Other Activities": orNone(otherActivities),
+      "Preferred Language": orNone(language),
+      "Driver Gender Preference": driverGender,
+      "Preferred Driver Age": orNone(driverAge),
+      "LGBTQ Friendly Driver": lgbtqFriendly,
+      "Child Friendly Driver": childFriendly,
+      "Food Preferences": orNone(foodPrefs.join(", ")),
+      "Spice Level": orNone(spiceLevel),
+      "Allergies / Medical": orNone(allergies),
+      "Cultural Preferences": orNone(culturalPrefs.join(", ")),
+      "Cultural Details": orNone(culturalDetails),
+      Budget: orNone(budget),
+      "Dream Trip": orNone(dreamTrip),
+      "Terms Agreed": agreed ? "Yes" : "No",
+      "Full Trip Request": buildSummary(),
+    };
+
+    try {
+      const response = await fetch("/", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: encodeFormData(payload),
+      });
+      if (!response.ok) throw new Error(`Status ${response.status}`);
+      setSubmitted(true);
+    } catch {
+      setSubmitError(true);
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   return (
@@ -985,13 +1127,27 @@ export default function Plan() {
                       </span>
                     </label>
 
+                    {submitError && (
+                      <p className="rounded-lg bg-red-50 px-4 py-2.5 text-sm text-red-600">
+                        Something went wrong sending your request. Please try
+                        again, or email us directly at{" "}
+                        <a
+                          href="mailto:hello@ceylonunscripted.com"
+                          className="font-semibold underline"
+                        >
+                          hello@ceylonunscripted.com
+                        </a>
+                        .
+                      </p>
+                    )}
+
                     <button
                       type="submit"
-                      disabled={!canSubmit}
+                      disabled={!canSubmit || submitting}
                       className="flex w-full items-center justify-center gap-2 rounded-full bg-gold-500 px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-gold-600 disabled:cursor-not-allowed disabled:opacity-45"
                     >
                       <Send size={16} />
-                      Submit My Request
+                      {submitting ? "Submitting..." : "Submit My Request"}
                     </button>
                   </SectionCard>
                 </div>
