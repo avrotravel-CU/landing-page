@@ -1,61 +1,12 @@
-import { JWT } from "google-auth-library";
-
-// Column order in the Google Sheet. "Submitted At" is filled in by the
-// server; everything else comes straight from the Plan My Trip form.
-const FIELD_ORDER = [
-  "Submitted At",
-  "First Name",
-  "Last Name",
-  "Email Address",
-  "Phone / WhatsApp",
-  "Country of Residence",
-  "Preferred Contact Method",
-  "Arrival Date",
-  "Departure Date",
-  "Number of Days",
-  "Adults",
-  "Infants",
-  "Children",
-  "Teens",
-  "Travelling with Pets",
-  "Destinations",
-  "Other Destinations",
-  "Hotel Rating",
-  "Room Types",
-  "Activities",
-  "Other Activities",
-  "Preferred Language",
-  "Driver Gender Preference",
-  "Preferred Driver Age",
-  "LGBTQ Friendly Driver",
-  "Child Friendly Driver",
-  "Food Preferences",
-  "Spice Level",
-  "Allergies / Medical",
-  "Cultural Preferences",
-  "Cultural Details",
-  "Budget",
-  "Dream Trip",
-  "Terms Agreed",
-  "Full Trip Request",
-];
-
-const SHEET_RANGE = "Sheet1!A1";
-
-function getClient() {
-  const email = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL;
-  const rawKey = process.env.GOOGLE_PRIVATE_KEY;
-  if (!email || !rawKey) {
-    throw new Error(
-      "Missing GOOGLE_SERVICE_ACCOUNT_EMAIL or GOOGLE_PRIVATE_KEY env vars"
-    );
-  }
-  return new JWT({
-    email,
-    key: rawKey.replace(/\\n/g, "\n"),
-    scopes: ["https://www.googleapis.com/auth/spreadsheets"],
-  });
-}
+// Forwards Plan My Trip submissions to a Google Apps Script Web App bound
+// to the destination Google Sheet. This avoids needing a Google Cloud
+// service account: the script lives inside the Sheet itself
+// (Extensions -> Apps Script) and appends a row on each request.
+//
+// This function exists mainly so the Apps Script URL never has to be
+// exposed to the browser (it's just an env var on the server), and so we
+// can read back a real success/error response instead of relying on
+// no-cors "fire and forget" requests from the client.
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
@@ -63,40 +14,33 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const sheetId = process.env.GOOGLE_SHEET_ID;
-  if (!sheetId) {
-    console.error("Missing GOOGLE_SHEET_ID env var");
+  const scriptUrl = process.env.GOOGLE_APPS_SCRIPT_URL;
+  if (!scriptUrl) {
+    console.error("Missing GOOGLE_APPS_SCRIPT_URL env var");
     return res.status(500).json({ error: "Server is not configured yet" });
   }
 
   try {
     const data = req.body && typeof req.body === "object" ? req.body : {};
 
-    const row = FIELD_ORDER.map((key) => {
-      if (key === "Submitted At") return new Date().toISOString();
-      const value = data[key];
-      return value === undefined || value === null ? "" : String(value);
-    });
-
-    const client = getClient();
-    const { access_token: accessToken } = await client.authorize();
-
-    const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${encodeURIComponent(
-      SHEET_RANGE
-    )}:append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS`;
-
-    const sheetsResponse = await fetch(url, {
+    const scriptResponse = await fetch(scriptUrl, {
       method: "POST",
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ values: [row] }),
+      headers: { "Content-Type": "application/json" },
+      // Apps Script Web Apps follow a redirect on POST; fetch follows
+      // redirects by default, so this resolves to the final JSON response.
+      body: JSON.stringify(data),
     });
 
-    if (!sheetsResponse.ok) {
-      const errorText = await sheetsResponse.text();
-      console.error("Google Sheets API error:", errorText);
+    const text = await scriptResponse.text();
+    let parsed;
+    try {
+      parsed = JSON.parse(text);
+    } catch {
+      parsed = null;
+    }
+
+    if (!scriptResponse.ok || !parsed || parsed.ok !== true) {
+      console.error("Apps Script error:", scriptResponse.status, text);
       return res
         .status(502)
         .json({ error: "Failed to save your request. Please try again." });
