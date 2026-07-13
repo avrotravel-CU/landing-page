@@ -36,3 +36,14 @@ body {
 h1, h2, h3, h4 {
   font-family: var(--font-serif);
 }
+
+/* Hide the browser's built-in calendar icon on date inputs; we render our
+   own clickable icon on top that calls showPicker() instead. */
+input[type="date"]::-webkit-calendar-picker-indicator {
+  opacity: 0;
+  position: absolute;
+  right: 0;
+  width: 2.5rem;
+  height: 100%;
+  cursor: pointer;
+}

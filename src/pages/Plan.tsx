@@ -1,4 +1,4 @@
-import { useState, type FormEvent, type ReactNode } from "react";
+import { useRef, useState, type FormEvent, type ReactNode } from "react";
 import {
   MapPin,
   Calendar,
@@ -223,17 +223,40 @@ function TextInput(
 }
 
 function DateInput(props: React.InputHTMLAttributes<HTMLInputElement>) {
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  function openPicker() {
+    const el = inputRef.current;
+    if (!el) return;
+    if ("showPicker" in el) {
+      try {
+        (el as HTMLInputElement & { showPicker: () => void }).showPicker();
+        return;
+      } catch {
+        // Some browsers throw if not called from a direct user gesture on
+        // the input itself; fall back to focusing the field.
+      }
+    }
+    el.focus();
+  }
+
   return (
     <div className="relative">
       <input
         {...props}
-        placeholder="dd/mm/yyyy"
-        className="w-full rounded-lg border border-forest-900/15 px-4 py-2.5 pr-10 text-sm text-forest-950 placeholder:text-forest-950/35 outline-none transition focus:border-gold-400"
+        ref={inputRef}
+        type="date"
+        className="w-full rounded-lg border border-forest-900/15 px-4 py-2.5 pr-10 text-sm text-forest-950 outline-none transition [color-scheme:light] focus:border-gold-400"
       />
-      <Calendar
-        size={16}
-        className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-forest-950/35"
-      />
+      <button
+        type="button"
+        onClick={openPicker}
+        tabIndex={-1}
+        aria-label="Open calendar"
+        className="absolute right-3.5 top-1/2 -translate-y-1/2 text-forest-950/35 transition hover:text-gold-500"
+      >
+        <Calendar size={16} />
+      </button>
     </div>
   );
 }
