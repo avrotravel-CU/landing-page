@@ -15,8 +15,11 @@ export default async function handler(req, res) {
   }
 
   const scriptUrl = process.env.GOOGLE_APPS_SCRIPT_URL;
-  if (!scriptUrl) {
-    console.error("Missing GOOGLE_APPS_SCRIPT_URL env var");
+  const sharedSecret = process.env.GOOGLE_APPS_SCRIPT_SECRET;
+  if (!scriptUrl || !sharedSecret) {
+    console.error(
+      "Missing GOOGLE_APPS_SCRIPT_URL or GOOGLE_APPS_SCRIPT_SECRET env vars"
+    );
     return res.status(500).json({ error: "Server is not configured yet" });
   }
 
@@ -28,7 +31,11 @@ export default async function handler(req, res) {
       headers: { "Content-Type": "application/json" },
       // Apps Script Web Apps follow a redirect on POST; fetch follows
       // redirects by default, so this resolves to the final JSON response.
-      body: JSON.stringify(data),
+      // The "secret" acts as a private API key: the deployment itself has
+      // to allow "Anyone" (so this server-to-server call is accepted at
+      // all), but the script rejects any request that doesn't include the
+      // matching secret, so it isn't really open to the public.
+      body: JSON.stringify({ ...data, secret: sharedSecret }),
     });
 
     const text = await scriptResponse.text();
