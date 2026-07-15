@@ -78,6 +78,14 @@ const ROOM_TYPES = [
   { label: "Villa", emoji: "🏡" },
 ];
 
+const MEAL_PLANS = [
+  { title: "Bed & Breakfast (B/B)", subtitle: "Breakfast and bed included" },
+  { title: "Half Board", subtitle: "Breakfast and dinner included" },
+  { title: "Full Board", subtitle: "All meals included" },
+  { title: "Bed Only", subtitle: "Room only — no meals needed" },
+  { title: "Mixed Options", subtitle: "Different requirements by stay" },
+];
+
 const ACTIVITIES = [
   { label: "Wildlife Safari", emoji: "🦁" },
   { label: "Volunteer Experiences", emoji: "🦋" },
@@ -436,6 +444,8 @@ export default function Plan() {
 
   const [hotelRating, setHotelRating] = useState("");
   const [roomTypes, setRoomTypes] = useState<string[]>([]);
+  const [mealPlan, setMealPlan] = useState("");
+  const [mixedMealDetails, setMixedMealDetails] = useState("");
 
   const [activities, setActivities] = useState<string[]>([]);
   const [otherActivities, setOtherActivities] = useState("");
@@ -515,6 +525,10 @@ export default function Plan() {
       "-".repeat(40),
       line("Preferred Hotel Rating", hotelRating),
       line("Preferred Room Type(s)", roomTypes.join(", ")),
+      line("Meal Plan", mealPlan),
+      ...(mealPlan === "Mixed Options"
+        ? [line("Mixed Meal Plan Details", mixedMealDetails)]
+        : []),
       "",
       "5. ACTIVITIES OF INTEREST",
       "-".repeat(40),
@@ -580,6 +594,9 @@ export default function Plan() {
       "Other Destinations": orNone(otherDestinations),
       "Hotel Rating": orNone(hotelRating),
       "Room Types": orNone(roomTypes.join(", ")),
+      "Meal Plan": orNone(mealPlan),
+      "Mixed Meal Plan Details":
+        mealPlan === "Mixed Options" ? orNone(mixedMealDetails) : "N/A",
       Activities: orNone(activities.join(", ")),
       "Other Activities": orNone(otherActivities),
       "Preferred Language": orNone(language),
@@ -937,6 +954,44 @@ export default function Plan() {
                           </button>
                         ))}
                       </div>
+                    </div>
+                    <div>
+                      <Label>Meal Plan</Label>
+                      <div className="space-y-3">
+                        {MEAL_PLANS.map((plan) => (
+                          <button
+                            key={plan.title}
+                            type="button"
+                            onClick={() => setMealPlan(plan.title)}
+                            className={
+                              mealPlan === plan.title
+                                ? "block w-full rounded-lg border-2 border-gold-500 bg-gold-50 px-4 py-3 text-left"
+                                : "block w-full rounded-lg border border-forest-900/15 px-4 py-3 text-left transition hover:border-gold-300"
+                            }
+                          >
+                            <span className="block text-sm font-bold text-forest-900">
+                              {plan.title}
+                            </span>
+                            <span className="block text-sm text-forest-950/55">
+                              {plan.subtitle}
+                            </span>
+                          </button>
+                        ))}
+                      </div>
+                      {mealPlan === "Mixed Options" && (
+                        <label className="mt-3 block">
+                          <span className="mb-1.5 block text-sm font-semibold text-forest-900">
+                            Please specify your meal plan requirements
+                          </span>
+                          <textarea
+                            rows={3}
+                            placeholder="e.g. B/B in Colombo, Half Board in the hills, Bed Only at the beach..."
+                            value={mixedMealDetails}
+                            onChange={(e) => setMixedMealDetails(e.target.value)}
+                            className="w-full resize-none rounded-lg border border-forest-900/15 px-4 py-2.5 text-sm text-forest-950 placeholder:text-forest-950/35 outline-none transition focus:border-gold-400"
+                          />
+                        </label>
+                      )}
                     </div>
                   </SectionCard>
 
