@@ -957,29 +957,50 @@ export default function Plan() {
                     </div>
                     <div>
                       <Label>Meal Plan</Label>
-                      <div className="space-y-2 rounded-lg border border-forest-900/15 p-3 sm:p-4">
-                        {MEAL_PLANS.map((plan) => (
-                          <label
-                            key={plan.title}
-                            className="flex cursor-pointer items-start gap-2.5 rounded-md px-1 py-1 transition hover:bg-cream-50"
-                          >
-                            <input
-                              type="radio"
-                              name="mealPlan"
-                              checked={mealPlan === plan.title}
-                              onChange={() => setMealPlan(plan.title)}
-                              className="mt-0.5 h-4 w-4 shrink-0 border-forest-900/30 text-gold-500 focus:ring-gold-400"
-                            />
-                            <span className="min-w-0">
-                              <span className="block text-sm font-medium text-forest-900">
-                                {plan.title}
+                      <div className="rounded-lg border border-forest-900/15 p-3 sm:p-4">
+                        <div className="grid grid-cols-2 gap-x-3 gap-y-2">
+                          {MEAL_PLANS.filter(
+                            (plan) => plan.title !== "Mixed Options"
+                          ).map((plan) => (
+                            <label
+                              key={plan.title}
+                              className="flex cursor-pointer items-start gap-2 rounded-md px-1 py-1 transition hover:bg-cream-50"
+                            >
+                              <input
+                                type="radio"
+                                name="mealPlan"
+                                checked={mealPlan === plan.title}
+                                onChange={() => setMealPlan(plan.title)}
+                                className="mt-0.5 h-4 w-4 shrink-0 border-forest-900/30 text-gold-500 focus:ring-gold-400"
+                              />
+                              <span className="min-w-0">
+                                <span className="block text-sm font-medium text-forest-900">
+                                  {plan.title}
+                                </span>
+                                <span className="block text-xs leading-snug text-forest-950/55">
+                                  {plan.subtitle}
+                                </span>
                               </span>
-                              <span className="block text-xs leading-snug text-forest-950/55">
-                                {plan.subtitle}
-                              </span>
+                            </label>
+                          ))}
+                        </div>
+                        <label className="mt-3 flex cursor-pointer items-start gap-2.5 border-t border-forest-900/10 px-1 pb-1 pt-3 transition hover:bg-cream-50">
+                          <input
+                            type="radio"
+                            name="mealPlan"
+                            checked={mealPlan === "Mixed Options"}
+                            onChange={() => setMealPlan("Mixed Options")}
+                            className="mt-0.5 h-4 w-4 shrink-0 border-forest-900/30 text-gold-500 focus:ring-gold-400"
+                          />
+                          <span className="min-w-0">
+                            <span className="block text-sm font-medium text-forest-900">
+                              Mixed Options
                             </span>
-                          </label>
-                        ))}
+                            <span className="block text-xs leading-snug text-forest-950/55">
+                              Different requirements by stay
+                            </span>
+                          </span>
+                        </label>
                       </div>
                       {mealPlan === "Mixed Options" && (
                         <label className="mt-3 block">
