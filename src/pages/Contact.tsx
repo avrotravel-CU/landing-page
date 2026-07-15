@@ -51,7 +51,7 @@ const CONTACT_DETAILS = [
   {
     icon: Phone,
     label: "Phone / WhatsApp",
-    value: "+94 77 123 4567",
+    value: "+94776718241",
   },
   {
     icon: Mail,
@@ -61,7 +61,7 @@ const CONTACT_DETAILS = [
   {
     icon: MapPin,
     label: "Address",
-    value: "42 Galle Road, Colombo 03, Sri Lanka",
+    value: "Dambuwa Watta, Imbulgoda, Gampaha",
   },
   {
     icon: Clock,
