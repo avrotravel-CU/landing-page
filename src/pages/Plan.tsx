@@ -62,12 +62,12 @@ const DESTINATIONS = [
 ];
 
 const HOTEL_RATINGS = [
-  "Budget",
+  "1 Star",
+  "2 Star",
   "3 Star",
   "4 Star",
   "5 Star",
   "Luxury Boutique",
-  "Mixed Options",
 ];
 
 const ROOM_TYPES = [
@@ -957,25 +957,28 @@ export default function Plan() {
                     </div>
                     <div>
                       <Label>Meal Plan</Label>
-                      <div className="space-y-3">
+                      <div className="space-y-2 rounded-lg border border-forest-900/15 p-3 sm:p-4">
                         {MEAL_PLANS.map((plan) => (
-                          <button
+                          <label
                             key={plan.title}
-                            type="button"
-                            onClick={() => setMealPlan(plan.title)}
-                            className={
-                              mealPlan === plan.title
-                                ? "block w-full rounded-lg border-2 border-gold-500 bg-gold-50 px-4 py-3 text-left"
-                                : "block w-full rounded-lg border border-forest-900/15 px-4 py-3 text-left transition hover:border-gold-300"
-                            }
+                            className="flex cursor-pointer items-start gap-2.5 rounded-md px-1 py-1 transition hover:bg-cream-50"
                           >
-                            <span className="block text-sm font-bold text-forest-900">
-                              {plan.title}
+                            <input
+                              type="radio"
+                              name="mealPlan"
+                              checked={mealPlan === plan.title}
+                              onChange={() => setMealPlan(plan.title)}
+                              className="mt-0.5 h-4 w-4 shrink-0 border-forest-900/30 text-gold-500 focus:ring-gold-400"
+                            />
+                            <span className="min-w-0">
+                              <span className="block text-sm font-medium text-forest-900">
+                                {plan.title}
+                              </span>
+                              <span className="block text-xs leading-snug text-forest-950/55">
+                                {plan.subtitle}
+                              </span>
                             </span>
-                            <span className="block text-sm text-forest-950/55">
-                              {plan.subtitle}
-                            </span>
-                          </button>
+                          </label>
                         ))}
                       </div>
                       {mealPlan === "Mixed Options" && (
