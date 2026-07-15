@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Menu, X } from "lucide-react";
+import logo from "../assets/logo.png";
 
 const NAV_LINKS = [
   { label: "Home", href: "/" },
@@ -20,17 +21,11 @@ export default function Header() {
     <header className="sticky top-0 z-50 w-full bg-white/95 backdrop-blur-sm border-b border-forest-100">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-3 lg:px-10">
         <Link to="/" className="flex items-center gap-3">
-          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gold-500 text-sm font-bold text-white">
-            CU
-          </span>
-          <span className="leading-[1.05]">
-            <span className="block font-serif text-[15px] font-bold text-forest-900">
-              Ceylon
-            </span>
-            <span className="block font-serif text-[13px] text-forest-950/50">
-              Unscripted
-            </span>
-          </span>
+          <img
+            src={logo}
+            alt="Ceylon Unscripted"
+            className="h-11 w-auto shrink-0"
+          />
           <span className="mx-1 hidden h-6 w-px bg-forest-900/15 sm:block" />
           <span className="hidden text-[13px] font-medium text-gold-500 sm:block">
             Sri Lanka, for you.
