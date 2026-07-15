@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Star, ArrowRight } from "lucide-react";
+import ShareYourStory from "../components/ShareYourStory";
 import {
   experiences,
   experienceCategories,
+  categoryBadgeStyles,
   type ExperienceCategory,
 } from "../data/experiences";
 import { testimonials } from "../data/testimonials";
@@ -21,7 +23,7 @@ export default function Experiences() {
       <section className="bg-forest-900">
         <div className="mx-auto max-w-3xl px-6 py-14 text-center lg:py-16">
           <span className="text-xs font-semibold uppercase tracking-[0.15em] text-gold-400">
-            Live It
+            LIVE IT
           </span>
           <h1 className="mt-2 font-serif text-3xl font-bold text-white sm:text-4xl">
             Experiences
@@ -35,7 +37,7 @@ export default function Experiences() {
 
       <section className="bg-white">
         <div className="mx-auto max-w-7xl px-6 py-16 lg:px-10 lg:py-20">
-          <div className="flex flex-wrap justify-center gap-2.5">
+          <div className="flex flex-wrap justify-start gap-2.5 lg:justify-center">
             <button
               onClick={() => setActive("All")}
               className={
@@ -70,10 +72,12 @@ export default function Experiences() {
                 <img
                   src={exp.image}
                   alt={exp.name}
-                  className="h-40 w-full object-cover"
+                  className="h-44 w-full object-cover"
                 />
                 <div className="p-4">
-                  <span className="inline-block rounded-full bg-gold-50 px-3 py-1 text-[11px] font-semibold text-gold-600">
+                  <span
+                    className={`inline-block rounded-full px-3 py-1 text-[11px] font-semibold ${categoryBadgeStyles[exp.category]}`}
+                  >
                     {exp.category}
                   </span>
                   <h3 className="mt-2 font-serif text-base font-bold text-forest-900">
@@ -126,12 +130,18 @@ export default function Experiences() {
                 </p>
                 <div className="mt-3 flex gap-0.5">
                   {Array.from({ length: t.rating }).map((_, i) => (
-                    <Star key={i} size={14} className="fill-gold-500 text-gold-500" />
+                    <Star
+                      key={i}
+                      size={14}
+                      className="fill-gold-500 text-gold-500"
+                    />
                   ))}
                 </div>
               </div>
             ))}
           </div>
+
+          <ShareYourStory />
 
           <div className="mt-12 rounded-2xl bg-peach-100 px-6 py-10 text-center">
             <h2 className="font-serif text-lg font-bold text-forest-900">

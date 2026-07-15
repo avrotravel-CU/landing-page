@@ -32,6 +32,15 @@ export type Experience = {
   description: string;
 };
 
+export const categoryBadgeStyles: Record<ExperienceCategory, string> = {
+  Adventure: "bg-orange-50 text-orange-700",
+  Culture: "bg-violet-50 text-violet-700",
+  Wellness: "bg-teal-50 text-teal-700",
+  Food: "bg-amber-50 text-amber-800",
+  Wildlife: "bg-yellow-50 text-yellow-800",
+  Water: "bg-sky-100 text-sky-800",
+};
+
 export const experiences: Experience[] = [
   {
     name: "Hike Adam's Peak",
