@@ -19,14 +19,14 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-50 w-full bg-white/95 backdrop-blur-sm border-b border-forest-100">
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-3 lg:px-10">
+      <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 lg:px-10">
         <Link to="/" className="flex items-center gap-3">
           <img
             src={logo}
             alt="Ceylon Unscripted"
-            className="h-11 w-auto shrink-0"
+            className="h-36 w-auto shrink-0"
           />
-          <span className="mx-1 hidden h-6 w-px bg-forest-900/15 sm:block" />
+          <span className="mx-1 hidden h-10 w-px bg-forest-900/15 sm:block" />
           <span className="hidden text-[13px] font-medium text-gold-500 sm:block">
             Sri Lanka, for you.
           </span>
