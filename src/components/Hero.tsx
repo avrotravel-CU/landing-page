@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
-import heroPoster from "../assets/hero-poster.jpg";
+import heroPoster from "../assets/visit_sri_Lanka_Ceylon.jpg";
 
 export default function Hero() {
   return (

@@ -71,7 +71,11 @@ const CONTACT_DETAILS = [
 ];
 
 const SOCIAL_LINKS = [
-  { icon: FacebookIcon, label: "Facebook" },
+  {
+    icon: FacebookIcon,
+    label: "Facebook",
+    href: "https://www.facebook.com/CeylonUnscripted",
+  },
   { icon: InstagramIcon, label: "Instagram" },
   { icon: YoutubeIcon, label: "YouTube" },
 ];
@@ -144,8 +148,13 @@ export default function Contact() {
                   {SOCIAL_LINKS.map((s) => (
                     <a
                       key={s.label}
-                      href="#"
-                      onClick={(e) => e.preventDefault()}
+                      href={s.href ?? "#"}
+                      {...(s.href
+                        ? {
+                            target: "_blank",
+                            rel: "noopener noreferrer",
+                          }
+                        : { onClick: (e) => e.preventDefault() })}
                       className="inline-flex items-center gap-2 rounded-full border border-forest-900/15 px-4 py-2 text-sm font-medium text-forest-950/70 transition hover:border-gold-400 hover:text-forest-900"
                     >
                       <s.icon size={16} />

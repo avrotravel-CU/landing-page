@@ -6,11 +6,11 @@ import {
   Clock,
   FileCheck2,
 } from "lucide-react";
-import bannerBg from "../assets/about-banner-bg.jpg";
-import faithBuddhism from "../assets/faith/faith-buddhism.jpg";
-import faithHinduism from "../assets/faith/faith-hinduism.jpg";
-import faithIslam from "../assets/faith/faith-islam.jpg";
-import faithChristianity from "../assets/faith/faith-christianity.jpg";
+import bannerBg from "../assets/visit_sri_Lanka_Sigiriya_Rock.jpg";
+import faithBuddhism from "../assets/faith/visit_sri_Lanka_Buddhism.jpg";
+import faithHinduism from "../assets/faith/visit_sri_Lanka_Hinduism.jpg";
+import faithIslam from "../assets/faith/visit_sri_Lanka_Islam.jpg";
+import faithChristianity from "../assets/faith/visit_sri_Lanka_Christianity.jpg";
 
 const QUICK_FACTS = [
   {

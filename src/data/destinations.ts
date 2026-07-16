@@ -1,15 +1,15 @@
-import sigiriya from "../assets/destinations/sigiriya.jpg";
-import ella from "../assets/destinations/ella.jpg";
-import kandy from "../assets/destinations/kandy.jpg";
-import galle from "../assets/destinations/galle.jpg";
-import yala from "../assets/destinations/yala.jpg";
-import mirissa from "../assets/destinations/mirissa.jpg";
-import nuwaraEliya from "../assets/destinations/nuwara-eliya.jpg";
-import trincomalee from "../assets/destinations/trincomalee.jpg";
-import arugamBay from "../assets/destinations/arugam-bay.jpg";
-import colombo from "../assets/destinations/colombo.jpg";
-import dambulla from "../assets/destinations/dambulla.jpg";
-import polonnaruwa from "../assets/destinations/polonnaruwa.jpg";
+import sigiriya from "../assets/destinations/visit_sri_Lanka_Sigiriya.jpg";
+import ella from "../assets/destinations/visit_sri_Lanka_Ella.jpg";
+import kandy from "../assets/destinations/visit_sri_Lanka_Kandy.jpg";
+import galle from "../assets/destinations/visit_sri_Lanka_Galle.jpg";
+import yala from "../assets/destinations/visit_sri_Lanka_Yala.jpg";
+import mirissa from "../assets/destinations/visit_sri_Lanka_Mirissa.jpg";
+import nuwaraEliya from "../assets/destinations/visit_sri_Lanka_Nuwara_Eliya.jpg";
+import trincomalee from "../assets/destinations/visit_sri_Lanka_Trincomalee.jpg";
+import arugamBay from "../assets/destinations/visit_sri_Lanka_Aruguam_Bay.jpg";
+import colombo from "../assets/destinations/visit_sri_Lanka_Colombo.jpg";
+import dambulla from "../assets/destinations/visit_sri_Lanka_Dambulla.jpg";
+import polonnaruwa from "../assets/destinations/visit_sri_Lanka_Polonnaruwa.jpg";
 
 export type Region =
   | "Cultural Triangle"

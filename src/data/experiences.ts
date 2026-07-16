@@ -1,18 +1,18 @@
-import hikeAdamsPeak from "../assets/experiences/hike_adams_peak.jpg";
-import paraglideElla from "../assets/experiences/paraglide_ella.jpg";
-import sigiriyaLionRock from "../assets/experiences/sigiriya_lion_rock.jpg";
-import pinnawalaOrphanage from "../assets/experiences/pinnawala_orphanage.jpg";
-import cookingClass from "../assets/experiences/cooking_class.jpg";
-import batikWorkshop from "../assets/experiences/batik_workshop.jpg";
-import ayurvedaRetreat from "../assets/experiences/ayurveda_retreat.jpg";
-import herbalGarden from "../assets/experiences/herbal_garden.jpg";
-import streetFoodTour from "../assets/experiences/street_food_tour.jpg";
-import teaFactory from "../assets/experiences/tea_factory.jpg";
-import elephantSafari from "../assets/experiences/elephant_safari.jpg";
-import leopardTracking from "../assets/experiences/leopard_tracking.jpg";
-import snorkelling from "../assets/experiences/snorkelling.jpg";
-import whaleWatching from "../assets/experiences/whale_watching.jpg";
-import surfLessons from "../assets/experiences/surf_lessons.jpg";
+import hikeAdamsPeak from "../assets/experiences/visit_sri_Lanka_Hike_Adams_Peak.jpg";
+import paraglideElla from "../assets/experiences/visit_sri_Lanka_Paraglide_Over_Ella.jpg";
+import sigiriyaLionRock from "../assets/experiences/visit_sri_Lanka_Sigiriya_Lion_Rock.jpg";
+import pinnawalaOrphanage from "../assets/experiences/visit_sri_Lanka_Pinnawala_Elephant_Orphanage.jpg";
+import cookingClass from "../assets/experiences/visit_sri_Lanka_Sri_Lankan_Cooking_Class.jpg";
+import batikWorkshop from "../assets/experiences/visit_sri_Lanka_Batik_Craft_Workshop.jpg";
+import ayurvedaRetreat from "../assets/experiences/visit_sri_Lanka_Ayurveda_Retreat.jpg";
+import herbalGarden from "../assets/experiences/visit_sri_Lanka_Herbal_Garden_Walk.jpg";
+import streetFoodTour from "../assets/experiences/visit_sri_Lanka_Street_Food_Tour_Colombo.jpg";
+import teaFactory from "../assets/experiences/visit_sri_Lanka_Tea_Factory_Visit.jpg";
+import elephantSafari from "../assets/experiences/visit_sri_Lanka_Elephant_Safari_Udawalawe.jpg";
+import leopardTracking from "../assets/experiences/visit_sri_Lanka_Leopard_Tracking_Yala.jpg";
+import snorkelling from "../assets/experiences/visit_sri_Lanka_Snorkelling_Pigeon_Island.jpg";
+import whaleWatching from "../assets/experiences/visit_sri_Lanka_Blue_Whale_Watching.jpg";
+import surfLessons from "../assets/experiences/visit_sri_Lanka_Surf_Lessons_Aruguam_Bay.jpg";
 
 export const experienceCategories = [
   "Adventure",
