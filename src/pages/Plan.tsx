@@ -472,19 +472,23 @@ export default function Plan() {
   const [agreed, setAgreed] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const [submitError, setSubmitError] = useState(false);
+  const [submitError, setSubmitError] = useState("");
 
-  const canSubmit = Boolean(
-    firstName.trim() &&
-      lastName.trim() &&
-      email.trim() &&
-      country &&
-      arrival &&
-      departure &&
-      days &&
-      adults &&
-      agreed
-  );
+  const missingRequired = (() => {
+    const missing: string[] = [];
+    if (!firstName.trim()) missing.push("First name");
+    if (!lastName.trim()) missing.push("Last name");
+    if (!email.trim()) missing.push("Email address");
+    if (!country) missing.push("Country of residence");
+    if (!arrival) missing.push("Planned arrival date");
+    if (!departure) missing.push("Planned departure date");
+    if (!days) missing.push("Number of days");
+    if (!adults) missing.push("Number of adults");
+    if (!agreed) missing.push("Terms & Privacy agreement");
+    return missing;
+  })();
+
+  const canSubmit = missingRequired.length === 0;
 
   function orNone(value: string): string {
     return value.trim() ? value : "None specified";
@@ -572,7 +576,7 @@ export default function Plan() {
     if (!canSubmit || submitting) return;
 
     setSubmitting(true);
-    setSubmitError(false);
+    setSubmitError("");
 
     const payload: Record<string, string> = {
       "First Name": firstName,
@@ -621,10 +625,21 @@ export default function Plan() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-      if (!response.ok) throw new Error(`Status ${response.status}`);
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        throw new Error(
+          typeof result.error === "string"
+            ? result.error
+            : `Request failed (${response.status})`
+        );
+      }
       setSubmitted(true);
-    } catch {
-      setSubmitError(true);
+    } catch (err) {
+      setSubmitError(
+        err instanceof Error
+          ? err.message
+          : "Something went wrong sending your request."
+      );
     } finally {
       setSubmitting(false);
     }
@@ -1239,8 +1254,20 @@ export default function Plan() {
 
                     {submitError && (
                       <p className="rounded-lg bg-red-50 px-4 py-2.5 text-sm text-red-600">
-                        Something went wrong sending your request. Please try
-                        again, or email us directly at{" "}
+                        {submitError}
+                        {submitError === "Unauthorized" && (
+                          <>
+                            {" "}
+                            Check that Vercel{" "}
+                            <span className="font-semibold">
+                              GOOGLE_APPS_SCRIPT_SECRET
+                            </span>{" "}
+                            matches Apps Script{" "}
+                            <span className="font-semibold">SHARED_SECRET</span>.
+                          </>
+                        )}
+                        {" "}
+                        Or email{" "}
                         <a
                           href="mailto:hello@ceylonunscripted.com"
                           className="font-semibold underline"
@@ -1248,6 +1275,15 @@ export default function Plan() {
                           hello@ceylonunscripted.com
                         </a>
                         .
+                      </p>
+                    )}
+
+                    {!canSubmit && !submitting && (
+                      <p className="rounded-lg border border-gold-200 bg-gold-50/80 px-4 py-2.5 text-sm text-forest-900">
+                        <span className="font-semibold">
+                          Scroll up to complete required fields:
+                        </span>{" "}
+                        {missingRequired.join(" · ")}
                       </p>
                     )}
 

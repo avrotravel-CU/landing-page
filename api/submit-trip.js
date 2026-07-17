@@ -35,7 +35,11 @@ export default async function handler(req, res) {
       // to allow "Anyone" (so this server-to-server call is accepted at
       // all), but the script rejects any request that doesn't include the
       // matching secret, so it isn't really open to the public.
-      body: JSON.stringify({ ...data, secret: sharedSecret }),
+      body: JSON.stringify({
+        action: "submitTrip",
+        ...data,
+        secret: sharedSecret,
+      }),
     });
 
     const text = await scriptResponse.text();
@@ -48,9 +52,11 @@ export default async function handler(req, res) {
 
     if (!scriptResponse.ok || !parsed || parsed.ok !== true) {
       console.error("Apps Script error:", scriptResponse.status, text);
-      return res
-        .status(502)
-        .json({ error: "Failed to save your request. Please try again." });
+      const detail =
+        parsed?.error ||
+        (text && text.length < 200 ? text : null) ||
+        "Failed to save your request. Please try again.";
+      return res.status(502).json({ error: detail });
     }
 
     return res.status(200).json({ ok: true });

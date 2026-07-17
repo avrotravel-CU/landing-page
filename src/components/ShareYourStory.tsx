@@ -1,5 +1,6 @@
 import { useRef, useState, type DragEvent, type FormEvent } from "react";
 import { Star, Send, Upload, X } from "lucide-react";
+import { encodeReviewPhotos } from "../lib/reviewPhotos";
 
 const MONTHS = [
   "January",
@@ -23,7 +24,12 @@ const RATING_LABELS = ["", "Poor", "Fair", "Good", "Very Good", "Excellent"];
 const MAX_REVIEW_LENGTH = 500;
 const MAX_PHOTOS = 5;
 
-export default function ShareYourStory() {
+type Props = {
+  /** Called after a review is saved so the page can refresh the list. */
+  onSubmitted?: () => void;
+};
+
+export default function ShareYourStory({ onSubmitted }: Props) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [name, setName] = useState("");
   const [country, setCountry] = useState("");
@@ -34,6 +40,8 @@ export default function ShareYourStory() {
   const [review, setReview] = useState("");
   const [photos, setPhotos] = useState<File[]>([]);
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState("");
   const [dragOver, setDragOver] = useState(false);
 
   const displayRating = hoverRating || rating;
@@ -44,7 +52,8 @@ export default function ShareYourStory() {
     month !== "" &&
     year !== "" &&
     rating > 0 &&
-    review.trim() !== "";
+    review.trim() !== "" &&
+    !submitting;
 
   function addPhotos(files: FileList | File[]) {
     const incoming = Array.from(files).filter((f) => f.type.startsWith("image/"));
@@ -61,10 +70,43 @@ export default function ShareYourStory() {
     setPhotos((prev) => prev.filter((_, i) => i !== index));
   }
 
-  function handleSubmit(e: FormEvent) {
+  async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     if (!canSubmit) return;
-    setSubmitted(true);
+
+    setSubmitting(true);
+    setSubmitError("");
+
+    try {
+      const encodedPhotos = await encodeReviewPhotos(photos);
+      const response = await fetch("/api/submit-review", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: name.trim(),
+          country: country.trim(),
+          month,
+          year,
+          rating,
+          review: review.trim(),
+          photos: encodedPhotos,
+        }),
+      });
+
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        throw new Error(data.error || "Could not submit your review");
+      }
+
+      setSubmitted(true);
+      onSubmitted?.();
+    } catch (err) {
+      setSubmitError(
+        err instanceof Error ? err.message : "Could not submit your review"
+      );
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   return (
@@ -74,7 +116,7 @@ export default function ShareYourStory() {
           Share Your Story
         </h2>
         <p className="mt-2 text-sm text-forest-950/60">
-          Travelled with Ceylon Unscripted? We'd love to hear from you.
+          Travelled with Ceylon Unscripted? We&apos;d love to hear from you.
         </p>
       </div>
 
@@ -82,11 +124,11 @@ export default function ShareYourStory() {
         {submitted ? (
           <div className="rounded-xl bg-gold-50 p-8 text-center">
             <p className="font-serif text-lg font-bold text-forest-900">
-              Thank you for sharing your story! 🙏
+              Thank you for sharing your story!
             </p>
             <p className="mt-2 text-sm text-forest-950/65">
-              Your review means the world to us and helps future travellers
-              discover the real Ceylon.
+              Your review is live on our Experiences page (refresh to see it).
+              It also appears in our Google Sheet under the Reviews tab.
             </p>
           </div>
         ) : (
@@ -272,13 +314,19 @@ export default function ShareYourStory() {
               )}
             </div>
 
+            {submitError && (
+              <p className="rounded-lg bg-red-50 px-4 py-2.5 text-sm text-red-600">
+                {submitError}
+              </p>
+            )}
+
             <button
               type="submit"
               disabled={!canSubmit}
               className="flex w-full items-center justify-center gap-2 rounded-full bg-gold-500 px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-gold-600 disabled:cursor-not-allowed disabled:opacity-50"
             >
               <Send size={16} />
-              Submit Your Story
+              {submitting ? "Submitting..." : "Submit Your Story"}
             </button>
           </form>
         )}

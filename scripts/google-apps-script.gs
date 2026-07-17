@@ -29,18 +29,38 @@ var TRIP_FIELD_COUNT = 37;
 var PAYMENT_COL_COUNT = 10;
 
 function doPost(e) {
-  var data = JSON.parse(e.postData.contents);
+  try {
+    if (!e || !e.postData || !e.postData.contents) {
+      return json({ ok: false, error: "Empty request body" });
+    }
 
-  var expectedSecret = PropertiesService.getScriptProperties().getProperty("SHARED_SECRET");
-  if (!expectedSecret || data.secret !== expectedSecret) {
-    return json({ ok: false, error: "Unauthorized" });
+    var data = JSON.parse(e.postData.contents);
+
+    var expectedSecret = PropertiesService.getScriptProperties().getProperty("SHARED_SECRET");
+    if (!expectedSecret || data.secret !== expectedSecret) {
+      return json({ ok: false, error: "Unauthorized" });
+    }
+
+    if (data.action === "recordPayment") {
+      return recordPayment(data);
+    }
+
+    if (data.action === "submitReview") {
+      return submitReview(data);
+    }
+
+    if (data.action === "listReviews") {
+      return listReviews(data);
+    }
+
+    // Plan My Trip (explicit action or legacy requests without action)
+    return submitTrip(data);
+  } catch (err) {
+    return json({
+      ok: false,
+      error: "Script error: " + (err && err.message ? err.message : String(err)),
+    });
   }
-
-  if (data.action === "recordPayment") {
-    return recordPayment(data);
-  }
-
-  return submitTrip(data);
 }
 
 function submitTrip(data) {
@@ -223,8 +243,185 @@ function appendTransactionRef(existing, newRef) {
   return existing + " | " + newRef;
 }
 
+// --- Customer reviews (Share Your Story) ---
+
+function ensureReviewsSheet() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName("Reviews");
+  if (!sheet) {
+    sheet = ss.insertSheet("Reviews");
+    sheet.appendRow([
+      "Submitted At",
+      "Name",
+      "Country",
+      "Visit Month",
+      "Visit Year",
+      "Rating",
+      "Review",
+      "Photo URLs",
+      "Display on Site",
+    ]);
+  }
+  return sheet;
+}
+
+function getReviewsPhotoFolder() {
+  var props = PropertiesService.getScriptProperties();
+  var id = props.getProperty("REVIEWS_DRIVE_FOLDER_ID");
+  if (id) {
+    try {
+      return DriveApp.getFolderById(String(id).trim());
+    } catch (e) {
+      throw new Error(
+        'REVIEWS_DRIVE_FOLDER_ID is invalid. Open your folder in Drive, copy the ID from the URL, and set Script property REVIEWS_DRIVE_FOLDER_ID.'
+      );
+    }
+  }
+  var folder = DriveApp.createFolder("Ceylon Unscripted Review Photos");
+  props.setProperty("REVIEWS_DRIVE_FOLDER_ID", folder.getId());
+  return folder;
+}
+
+function saveReviewPhotos(photos) {
+  if (!photos || !photos.length) return [];
+
+  var folder = getReviewsPhotoFolder();
+  var urls = [];
+
+  for (var i = 0; i < photos.length; i++) {
+    var item = photos[i];
+    if (!item || !item.data) continue;
+
+    var mime = item.mime || "image/jpeg";
+    var name =
+      String(item.name || "review-photo-" + i + ".jpg").replace(/[^\w.\-]+/g, "_");
+    var blob = Utilities.newBlob(Utilities.base64Decode(String(item.data)), mime, name);
+    var file = folder.createFile(blob);
+    file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+    urls.push("https://drive.google.com/uc?export=view&id=" + file.getId());
+  }
+
+  return urls;
+}
+
+function submitReview(data) {
+  try {
+    var name = String(data.name || "").trim();
+    var country = String(data.country || "").trim();
+    var month = String(data.month || "").trim();
+    var year = String(data.year || "").trim();
+    var rating = Number(data.rating);
+    var reviewText = String(data.review || "").trim();
+
+    if (!name || !country || !month || !year || !reviewText) {
+      return json({ ok: false, error: "Missing required review fields" });
+    }
+    if (!rating || rating < 1 || rating > 5) {
+      return json({ ok: false, error: "Invalid rating" });
+    }
+
+    var photoUrls = saveReviewPhotos(data.photos);
+    var sheet = ensureReviewsSheet();
+
+    var displayStatus = "Yes";
+
+    sheet.appendRow([
+      new Date(),
+      name,
+      country,
+      month,
+      year,
+      rating,
+      reviewText,
+      photoUrls.join(" | "),
+      displayStatus,
+    ]);
+
+    return json({
+      ok: true,
+      displayStatus: displayStatus,
+      photoCount: photoUrls.length,
+      folderId: getReviewsPhotoFolder().getId(),
+    });
+  } catch (err) {
+    return json({
+      ok: false,
+      error: err && err.message ? err.message : String(err),
+    });
+  }
+}
+
+function listReviews() {
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Reviews");
+  if (!sheet || sheet.getLastRow() < 2) {
+    return json({ ok: true, reviews: [] });
+  }
+
+  var values = sheet.getRange(2, 1, sheet.getLastRow(), 9).getValues();
+  var reviews = [];
+
+  for (var i = values.length - 1; i >= 0; i--) {
+    var row = values[i];
+    var display = String(row[8] || "").trim();
+    if (display !== "Yes") continue;
+
+    var photoRaw = String(row[7] || "").trim();
+    var photos = photoRaw
+      ? photoRaw.split(" | ").filter(function (u) {
+          return u.trim();
+        })
+      : [];
+
+    reviews.push({
+      id: "review-" + (i + 2),
+      name: String(row[1] || ""),
+      location: String(row[2] || ""),
+      visited: String(row[3] || "") + " " + String(row[4] || ""),
+      quote: String(row[6] || ""),
+      rating: Number(row[5]) || 5,
+      photos: photos,
+      submittedAt: row[0] ? new Date(row[0]).toISOString() : "",
+    });
+  }
+
+  return json({ ok: true, reviews: reviews });
+}
+
 function json(obj) {
   return ContentService.createTextOutput(JSON.stringify(obj)).setMimeType(
     ContentService.MimeType.JSON
   );
+}
+
+/**
+ * Run once from the Apps Script editor (Run ▶) after updating Code.gs.
+ * Re-grants Spreadsheet + Drive access so the Web App can write again.
+ */
+function authorizeScript() {
+  SpreadsheetApp.getActiveSpreadsheet().getName();
+  DriveApp.getRootFolder().getId();
+  return "Authorization OK — save and use your existing Web App deployment URL.";
+}
+
+/**
+ * Run from the editor (Run ▶) to test Reviews tab + Drive WITHOUT the website.
+ * Check: Reviews tab new row + photo file in your review photos folder.
+ */
+function testSubmitReviewInSheet() {
+  var result = submitReview({
+    name: "Apps Script Test",
+    country: "Sri Lanka",
+    month: "July",
+    year: "2026",
+    rating: 5,
+    review: "Test row from Apps Script editor — safe to delete.",
+    photos: [
+      {
+        mime: "image/png",
+        name: "test-pixel.png",
+        data: "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==",
+      },
+    ],
+  });
+  Logger.log(result.getContent());
 }

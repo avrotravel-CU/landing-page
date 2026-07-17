@@ -1,17 +1,61 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Star, ArrowRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import ShareYourStory from "../components/ShareYourStory";
+import TravelerReviewCard from "../components/TravelerReviewCard";
 import {
   experiences,
   experienceCategories,
   categoryBadgeStyles,
   type ExperienceCategory,
 } from "../data/experiences";
-import { testimonials } from "../data/testimonials";
+import { testimonials, type Testimonial } from "../data/testimonials";
+import type { CustomerReview } from "../types/review";
+
+function mapCustomerReview(r: CustomerReview): Testimonial {
+  return {
+    id: r.id,
+    name: r.name,
+    location: r.location,
+    visited: r.visited.trim(),
+    quote: r.quote,
+    rating: r.rating,
+    photos: r.photos,
+  };
+}
 
 export default function Experiences() {
   const [active, setActive] = useState<ExperienceCategory | "All">("All");
+  const [customerReviews, setCustomerReviews] = useState<Testimonial[]>([]);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/reviews")
+      .then((res) => res.json())
+      .then((data: { reviews?: CustomerReview[] }) => {
+        if (cancelled) return;
+        setCustomerReviews(
+          data.reviews?.length ? data.reviews.map(mapCustomerReview) : []
+        );
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  function refreshReviews() {
+    fetch("/api/reviews")
+      .then((res) => res.json())
+      .then((data: { reviews?: CustomerReview[] }) => {
+        setCustomerReviews(
+          data.reviews?.length ? data.reviews.map(mapCustomerReview) : []
+        );
+      })
+      .catch(() => {});
+  }
+
+  const displayedReviews = [...customerReviews, ...testimonials];
 
   const filtered =
     active === "All"
@@ -104,44 +148,13 @@ export default function Experiences() {
             </p>
           </div>
 
-          <div className="mt-10 grid grid-cols-1 gap-6 lg:grid-cols-2">
-            {testimonials.map((t) => (
-              <div
-                key={t.name}
-                className="rounded-xl border border-gold-100 bg-white p-6 shadow-sm"
-              >
-                <div className="flex items-center gap-3">
-                  <img
-                    src={t.avatar}
-                    alt={t.name}
-                    className="h-11 w-11 rounded-full object-cover"
-                  />
-                  <div>
-                    <div className="text-sm font-bold text-forest-900">
-                      {t.name}
-                    </div>
-                    <div className="text-xs text-forest-950/50">
-                      {t.location}
-                    </div>
-                  </div>
-                </div>
-                <p className="mt-4 text-[13px] leading-relaxed text-forest-950/70">
-                  "{t.quote}"
-                </p>
-                <div className="mt-3 flex gap-0.5">
-                  {Array.from({ length: t.rating }).map((_, i) => (
-                    <Star
-                      key={i}
-                      size={14}
-                      className="fill-gold-500 text-gold-500"
-                    />
-                  ))}
-                </div>
-              </div>
+          <div className="mt-10 grid grid-cols-1 gap-8 lg:grid-cols-2">
+            {displayedReviews.map((t) => (
+              <TravelerReviewCard key={t.id ?? t.name} review={t} />
             ))}
           </div>
 
-          <ShareYourStory />
+          <ShareYourStory onSubmitted={refreshReviews} />
 
           <div className="mt-12 rounded-2xl bg-peach-100 px-6 py-10 text-center">
             <h2 className="font-serif text-lg font-bold text-forest-900">
