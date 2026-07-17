@@ -1,5 +1,6 @@
 import { Star } from "lucide-react";
 import type { Testimonial } from "../data/testimonials";
+import ReviewPhoto from "./ReviewPhoto";
 
 type Props = {
   review: Testimonial;
@@ -32,7 +33,7 @@ export default function TravelerReviewCard({ review }: Props) {
           }
         >
           {visiblePhotos.map((src, i) => (
-            <img
+            <ReviewPhoto
               key={`${name}-photo-${i}`}
               src={src}
               alt={`${name} — photo ${i + 1}`}

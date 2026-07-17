@@ -282,6 +282,16 @@ function getReviewsPhotoFolder() {
   return folder;
 }
 
+function normalizeDrivePhotoUrl(url) {
+  var u = String(url || "").trim();
+  if (!u) return u;
+  var m = u.match(/[?&]id=([^&]+)/);
+  if (m) return "https://drive.google.com/thumbnail?id=" + m[1] + "&sz=w1600";
+  m = u.match(/\/d\/([^/]+)/);
+  if (m) return "https://drive.google.com/thumbnail?id=" + m[1] + "&sz=w1600";
+  return u;
+}
+
 function saveReviewPhotos(photos) {
   if (!photos || !photos.length) return [];
 
@@ -298,7 +308,8 @@ function saveReviewPhotos(photos) {
     var blob = Utilities.newBlob(Utilities.base64Decode(String(item.data)), mime, name);
     var file = folder.createFile(blob);
     file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
-    urls.push("https://drive.google.com/uc?export=view&id=" + file.getId());
+    var fileId = file.getId();
+    urls.push("https://drive.google.com/thumbnail?id=" + fileId + "&sz=w1600");
   }
 
   return urls;
@@ -369,7 +380,7 @@ function listReviews() {
     var photos = photoRaw
       ? photoRaw.split(" | ").filter(function (u) {
           return u.trim();
-        })
+        }).map(normalizeDrivePhotoUrl)
       : [];
 
     reviews.push({
