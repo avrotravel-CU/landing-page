@@ -7,13 +7,12 @@
  * 3. photos[] — trip photos (shown on the card). avatar — small profile image.
  */
 
-import avatarSarah from "../assets/testimonials/avatar_sarah.jpg";
 import avatarJames from "../assets/testimonials/avatar_james.jpg";
 import avatarMariaCarlos from "../assets/testimonials/avatar_maria_carlos.jpg";
 import avatarPatel from "../assets/testimonials/avatar_patel.jpg";
 
-import sarahCooking from "../assets/experiences/visit_sri_Lanka_Sri_Lankan_Cooking_Class.jpg";
-import sarahFood from "../assets/experiences/visit_sri_Lanka_Street_Food_Tour_Colombo.jpg";
+import sarahCooking1 from "../assets/testimonials/reviews/sarah_cooking_1.jpg";
+import sarahCooking2 from "../assets/testimonials/reviews/sarah_cooking_2.jpg";
 import jamesElephants from "../assets/experiences/visit_sri_Lanka_Elephant_Safari_Udawalawe.jpg";
 import jamesPinnawala from "../assets/experiences/visit_sri_Lanka_Pinnawala_Elephant_Orphanage.jpg";
 import mariaAdamsPeak from "../assets/experiences/visit_sri_Lanka_Hike_Adams_Peak.jpg";
@@ -37,8 +36,7 @@ export const testimonials: Testimonial[] = [
     name: "Sarah Thompson",
     location: "Melbourne, Australia",
     visited: "November 2025",
-    avatar: avatarSarah,
-    photos: [sarahCooking, sarahFood],
+    photos: [sarahCooking1, sarahCooking2],
     quote:
       "The cooking class in a local home was absolutely unforgettable. Learning to make hoppers from scratch while hearing stories about family recipes passed down generations, that's the real Ceylon. Our host treated us like family, not tourists.",
     rating: 5,
