@@ -133,6 +133,30 @@ export default function PaymentStepTwo({ booking, onBack }: Props) {
   const formReady = Boolean(milestoneId && cardValid && !processing);
   const canSubmit = formReady && agreed;
 
+  async function syncPaymentToSheet(result: PaymentResultState) {
+    if (!breakdown || !milestoneId) return;
+
+    const milestone = PAYMENT_MILESTONES.find((m) => m.id === milestoneId);
+    try {
+      await fetch("/api/record-payment", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          quotation: booking.quotation,
+          paymentAmount: breakdown.paymentAmount,
+          milestone: milestoneId,
+          milestoneLabel: milestone?.label,
+          name: booking.name,
+          email: booking.email,
+          transactionRef: result.transactionRef,
+          stripePaymentIntentId: result.stripePaymentIntentId,
+        }),
+      });
+    } catch {
+      // Stripe payment succeeded; sheet sync is best-effort.
+    }
+  }
+
   function buildResult(card: CardDetails): PaymentResultState {
     return {
       booking: {
@@ -206,6 +230,7 @@ export default function PaymentStepTwo({ booking, onBack }: Props) {
         return;
       }
 
+      await syncPaymentToSheet(result);
       navigate("/payment-success", { state: result });
     } catch (err) {
       setError(
@@ -216,7 +241,7 @@ export default function PaymentStepTwo({ booking, onBack }: Props) {
     }
   }
 
-  function processDemoPayment() {
+  async function processDemoPayment() {
     if (!breakdown) return;
 
     const result = buildResult({
@@ -235,6 +260,7 @@ export default function PaymentStepTwo({ booking, onBack }: Props) {
       return;
     }
 
+    await syncPaymentToSheet(result);
     navigate("/payment-success", { state: result });
   }
 
@@ -243,7 +269,7 @@ export default function PaymentStepTwo({ booking, onBack }: Props) {
       await processStripePayment();
       return;
     }
-    processDemoPayment();
+    void processDemoPayment();
   }
 
   function handleSubmit(e: FormEvent) {
