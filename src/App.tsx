@@ -10,7 +10,6 @@ import PaymentSuccess from "./pages/PaymentSuccess";
 import PaymentDeclined from "./pages/PaymentDeclined";
 import Contact from "./pages/Contact";
 import Plan from "./pages/Plan";
-import Privacy from "./pages/Privacy";
 
 export default function App() {
   usePageTitle();
@@ -27,7 +26,6 @@ export default function App() {
         <Route path="/payment-declined" element={<PaymentDeclined />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/plan" element={<Plan />} />
-        <Route path="/privacy" element={<Privacy />} />
       </Routes>
       <Footer />
     </div>

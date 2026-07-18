@@ -3,8 +3,17 @@ export type TermsBullet = {
   text: string;
 };
 
-export type { TermsSection } from "../types/legal";
-import type { TermsSection } from "../types/legal";
+export type TermsSection = {
+  title: string;
+  intro?: string;
+  bullets?: TermsBullet[];
+  paragraphs?: string[];
+  listItems?: string[];
+  introAfterList?: string;
+  listItemsAfter?: string[];
+  closingParagraph?: string;
+  dividerAfter?: boolean;
+};
 
 export const PAYMENT_TERMS_TITLE = "Terms and Conditions for Payments";
 

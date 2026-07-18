@@ -10,17 +10,7 @@ import {
   Info,
 } from "lucide-react";
 import planCollage from "../assets/plan-collage.jpg";
-import LegalDocumentModal from "../components/LegalDocumentModal";
 import { COUNTRIES } from "../data/countries";
-import {
-  PAYMENT_TERMS_SECTIONS,
-  PAYMENT_TERMS_TITLE,
-} from "../data/paymentTerms";
-import {
-  PRIVACY_INTRO,
-  PRIVACY_SECTIONS,
-  PRIVACY_STATEMENT_TITLE,
-} from "../data/privacyStatement";
 import { getPlanPrefillFromPackage } from "../lib/tourPackagePrefill";
 
 function parseDateOnly(value: string): Date | null {
@@ -539,9 +529,6 @@ export default function Plan() {
   const [budget, setBudget] = useState("");
   const [dreamTrip, setDreamTrip] = useState("");
   const [agreed, setAgreed] = useState(false);
-  const [legalModal, setLegalModal] = useState<"terms" | "privacy" | null>(
-    null
-  );
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
@@ -847,19 +834,6 @@ export default function Plan() {
             </div>
           ) : (
             <form onSubmit={handleSubmit} autoComplete="off">
-              <div className="mb-8 flex items-start gap-3 rounded-xl border border-blue-100 bg-blue-50 px-5 py-4">
-                <Info size={18} className="mt-0.5 shrink-0 text-blue-600" />
-                <div>
-                  <p className="text-sm font-semibold text-blue-900">
-                    Entry tickets &amp; activities not included
-                  </p>
-                  <p className="mt-1 text-sm leading-relaxed text-blue-800/85">
-                    Entry tickets for places and fun activities are not included
-                    in your tour quote. You will need to pay for these yourself
-                    during your trip.
-                  </p>
-                </div>
-              </div>
               {selectedPackageName && (
                 <div className="mb-8 rounded-xl border border-gold-200 bg-gold-50 px-5 py-4">
                   <p className="text-sm font-semibold text-forest-900">
@@ -876,6 +850,20 @@ export default function Plan() {
                   </p>
                 </div>
               )}
+              <div className="mb-8 flex items-start gap-3 rounded-xl border border-blue-200 bg-blue-50 px-5 py-4">
+                <Info size={18} className="mt-0.5 shrink-0 text-blue-600" />
+                <div>
+                  <p className="text-sm font-semibold text-blue-900">
+                    Entry tickets &amp; paid activities
+                  </p>
+                  <p className="mt-1 text-sm leading-relaxed text-blue-800/85">
+                    Entry tickets for places and fun activities are not included
+                    in your quote by default — you pay for these yourself on the
+                    day. If you&apos;d like them included in your quote, please
+                    specify in your note below.
+                  </p>
+                </div>
+              </div>
               <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 lg:gap-8">
                 <div className="space-y-6">
                   <SectionCard num={1} title="Contact Information">
@@ -1427,21 +1415,21 @@ export default function Plan() {
                       />
                       <span className="text-sm text-forest-950/70">
                         I agree to the{" "}
-                        <button
-                          type="button"
-                          onClick={() => setLegalModal("terms")}
+                        <a
+                          href="#"
+                          onClick={(e) => e.preventDefault()}
                           className="font-medium text-gold-600 hover:underline"
                         >
                           Terms &amp; Conditions
-                        </button>{" "}
+                        </a>{" "}
                         and{" "}
-                        <button
-                          type="button"
-                          onClick={() => setLegalModal("privacy")}
+                        <a
+                          href="#"
+                          onClick={(e) => e.preventDefault()}
                           className="font-medium text-gold-600 hover:underline"
                         >
                           Privacy Policy
-                        </button>
+                        </a>
                         . I consent to being contacted about my trip request.
                       </span>
                     </label>
@@ -1469,6 +1457,15 @@ export default function Plan() {
                           hello@ceylonunscripted.com
                         </a>
                         .
+                      </p>
+                    )}
+
+                    {!canSubmit && !submitting && (
+                      <p className="rounded-lg border border-gold-200 bg-gold-50/80 px-4 py-2.5 text-sm text-forest-900">
+                        <span className="font-semibold">
+                          Scroll up to complete required fields:
+                        </span>{" "}
+                        {missingRequired.join(" · ")}
                       </p>
                     )}
 
@@ -1532,21 +1529,6 @@ export default function Plan() {
               </div>
             </form>
           )}
-
-          <LegalDocumentModal
-            open={legalModal === "terms"}
-            onClose={() => setLegalModal(null)}
-            title={PAYMENT_TERMS_TITLE}
-            subtitle="Please review these terms before submitting your trip request."
-            sections={PAYMENT_TERMS_SECTIONS}
-          />
-          <LegalDocumentModal
-            open={legalModal === "privacy"}
-            onClose={() => setLegalModal(null)}
-            title={PRIVACY_STATEMENT_TITLE}
-            intro={PRIVACY_INTRO}
-            sections={PRIVACY_SECTIONS}
-          />
         </div>
       </section>
     </main>
