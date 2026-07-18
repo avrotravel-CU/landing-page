@@ -7,6 +7,7 @@ import {
   Phone,
   CheckCircle2,
   Send,
+  Info,
 } from "lucide-react";
 import planCollage from "../assets/plan-collage.jpg";
 import { COUNTRIES } from "../data/countries";
@@ -833,6 +834,19 @@ export default function Plan() {
             </div>
           ) : (
             <form onSubmit={handleSubmit} autoComplete="off">
+              <div className="mb-8 flex items-start gap-3 rounded-xl border border-blue-100 bg-blue-50 px-5 py-4">
+                <Info size={18} className="mt-0.5 shrink-0 text-blue-600" />
+                <div>
+                  <p className="text-sm font-semibold text-blue-900">
+                    Entry tickets &amp; transport extras not included
+                  </p>
+                  <p className="mt-1 text-sm leading-relaxed text-blue-800/85">
+                    Entry tickets for attractions, train journeys, and similar
+                    activities are not included in your tour quote. These costs
+                    are paid directly by you during your trip.
+                  </p>
+                </div>
+              </div>
               {selectedPackageName && (
                 <div className="mb-8 rounded-xl border border-gold-200 bg-gold-50 px-5 py-4">
                   <p className="text-sm font-semibold text-forest-900">

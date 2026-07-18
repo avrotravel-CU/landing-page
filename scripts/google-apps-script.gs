@@ -45,6 +45,10 @@ function doPost(e) {
       return recordPayment(data);
     }
 
+    if (data.action === "lookupBooking") {
+      return lookupBooking(data);
+    }
+
     if (data.action === "submitReview") {
       return submitReview(data);
     }
@@ -86,6 +90,77 @@ function submitTrip(data) {
   return json({ ok: true });
 }
 
+function findBookingRow(sheet, quotation) {
+  var lastRow = sheet.getLastRow();
+  if (lastRow < 2) {
+    return { ok: false, error: "No trip requests in sheet" };
+  }
+
+  var values = sheet.getRange(2, 1, lastRow, COL.TRANSACTION_REFS).getValues();
+
+  for (var i = 0; i < values.length; i++) {
+    var cellQuotation = String(values[i][COL.QUOTATION - 1] || "").trim();
+    if (cellQuotation.toLowerCase() === quotation.toLowerCase()) {
+      return {
+        ok: true,
+        rowIndex: i + 2,
+        row: values[i],
+      };
+    }
+  }
+
+  return { ok: false, error: "Quotation not found: " + quotation };
+}
+
+function lookupBooking(data) {
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Sheet1");
+  if (!sheet) {
+    return json({ ok: false, error: 'Missing "Sheet1" tab' });
+  }
+
+  var quotation = String(data.quotation || "").trim();
+  if (!quotation) {
+    return json({ ok: false, error: "Quotation number is required" });
+  }
+
+  var found = findBookingRow(sheet, quotation);
+  if (!found.ok) {
+    return json(found);
+  }
+
+  var row = found.row;
+  var tourAmount = Number(row[COL.TOUR_AMOUNT - 1]) || 0;
+  var totalPaid = Number(row[COL.TOTAL_PAID - 1]) || 0;
+  var amountOwed = Math.max(0, tourAmount - totalPaid);
+  var arrivalRaw = row[COL.ARRIVAL_DATE - 1];
+  var daysTillArrival = computeDaysTillArrival(arrivalRaw);
+  var firstName = String(row[1] || "").trim();
+  var lastName = String(row[2] || "").trim();
+  var fullName = [firstName, lastName].filter(Boolean).join(" ");
+  var email = String(row[3] || "").trim();
+  var phone = String(row[4] || "").trim();
+
+  if (!tourAmount || tourAmount <= 0) {
+    return json({
+      ok: false,
+      error: "Tour Amount (USD) missing on that row — add it in the sheet first",
+    });
+  }
+
+  return json({
+    ok: true,
+    quotation: quotation,
+    name: fullName || firstName,
+    email: email,
+    phone: phone,
+    tourAmount: roundMoney(tourAmount),
+    totalPaid: roundMoney(totalPaid),
+    amountOwed: roundMoney(amountOwed),
+    arrivalDate: formatDateValue(arrivalRaw),
+    daysTillArrival: daysTillArrival === "" ? null : daysTillArrival,
+  });
+}
+
 function recordPayment(data) {
   var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Sheet1");
   if (!sheet) {
@@ -102,27 +177,13 @@ function recordPayment(data) {
     return json({ ok: false, error: "A valid payment amount is required" });
   }
 
-  var lastRow = sheet.getLastRow();
-  if (lastRow < 2) {
-    return json({ ok: false, error: "No trip requests in sheet" });
+  var found = findBookingRow(sheet, quotation);
+  if (!found.ok) {
+    return json(found);
   }
 
-  var values = sheet.getRange(2, 1, lastRow, COL.TRANSACTION_REFS).getValues();
-  var rowIndex = -1;
-  var row = null;
-
-  for (var i = 0; i < values.length; i++) {
-    var cellQuotation = String(values[i][COL.QUOTATION - 1] || "").trim();
-    if (cellQuotation.toLowerCase() === quotation.toLowerCase()) {
-      rowIndex = i + 2;
-      row = values[i];
-      break;
-    }
-  }
-
-  if (rowIndex === -1) {
-    return json({ ok: false, error: "Quotation not found: " + quotation });
-  }
+  var rowIndex = found.rowIndex;
+  var row = found.row;
 
   var tourAmount = Number(row[COL.TOUR_AMOUNT - 1]);
   if (!tourAmount || tourAmount <= 0) {
@@ -209,6 +270,14 @@ function getTripFieldOrder() {
     "Terms Agreed",
     "Full Trip Request",
   ];
+}
+
+function formatDateValue(value) {
+  if (!value) return "";
+  if (Object.prototype.toString.call(value) === "[object Date]") {
+    return Utilities.formatDate(value, Session.getScriptTimeZone(), "yyyy-MM-dd");
+  }
+  return String(value);
 }
 
 function computeDaysTillArrival(arrivalRaw) {

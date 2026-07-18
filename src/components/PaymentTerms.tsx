@@ -15,17 +15,12 @@ function TermsContent({ compact = false }: { compact?: boolean }) {
         <div key={section.title}>
           <p className="font-semibold text-forest-900">{section.title}</p>
           {section.intro && <p className="mt-1">{section.intro}</p>}
-          {section.paragraphs?.map((paragraph) => (
-            <p key={paragraph} className="mt-1">
-              {paragraph}
-            </p>
-          ))}
           {section.bullets && (
             <ul className="mt-2 space-y-2">
               {section.bullets.map((bullet) => (
                 <li key={bullet.label}>
                   <span className="font-medium text-forest-900">
-                    {bullet.label}
+                    • {bullet.label}
                   </span>
                   <br />
                   {bullet.text}
@@ -33,6 +28,11 @@ function TermsContent({ compact = false }: { compact?: boolean }) {
               ))}
             </ul>
           )}
+          {section.paragraphs?.map((paragraph) => (
+            <p key={paragraph} className="mt-1">
+              {paragraph}
+            </p>
+          ))}
           {section.listItems && (
             <ul className="mt-2 list-disc space-y-1 pl-5">
               {section.listItems.map((item) => (

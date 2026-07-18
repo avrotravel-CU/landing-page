@@ -1,4 +1,4 @@
-import { useState, useEffect, type FormEvent } from "react";
+import { useState, useEffect, useCallback, type FormEvent } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Elements } from "@stripe/react-stripe-js";
 import {
@@ -148,6 +148,57 @@ export default function Payments() {
       currency: "usd",
     }
   );
+  const [lookupLoading, setLookupLoading] = useState(false);
+  const [lookupError, setLookupError] = useState("");
+  const [lookupReady, setLookupReady] = useState(
+    Boolean(restored?.booking?.daysTillArrival != null)
+  );
+
+  const lookupBooking = useCallback(async (quotation: string) => {
+    const trimmed = quotation.trim();
+    if (!trimmed) {
+      setLookupReady(false);
+      setLookupError("");
+      return;
+    }
+
+    setLookupLoading(true);
+    setLookupError("");
+
+    try {
+      const response = await fetch("/api/lookup-booking", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ quotation: trimmed }),
+      });
+      const data = await response.json();
+
+      if (!response.ok) {
+        setLookupReady(false);
+        setLookupError(data.error || "Could not find that quotation number.");
+        return;
+      }
+
+      setBooking((current) => ({
+        ...current,
+        quotation: trimmed,
+        name: current.name.trim() || data.name || current.name,
+        email: current.email.trim() || data.email || current.email,
+        phone: current.phone.trim() || data.phone || current.phone,
+        amount: String(data.tourAmount ?? current.amount),
+        arrivalDate: data.arrivalDate || undefined,
+        daysTillArrival: data.daysTillArrival,
+        totalPaid: data.totalPaid ?? 0,
+        amountOwed: data.amountOwed,
+      }));
+      setLookupReady(true);
+    } catch {
+      setLookupReady(false);
+      setLookupError("Could not verify your quotation. Please try again.");
+    } finally {
+      setLookupLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
     if (restored?.step) {
@@ -162,7 +213,10 @@ export default function Payments() {
       booking.quotation.trim() &&
       booking.email.trim() &&
       booking.amount.trim() &&
-      Number(booking.amount) > 0
+      Number(booking.amount) > 0 &&
+      lookupReady &&
+      booking.daysTillArrival != null &&
+      !lookupLoading
   );
 
   function handleStep1Submit(e: FormEvent) {
@@ -226,10 +280,39 @@ export default function Payments() {
                   label="Quotation Number"
                   placeholder="Enter your quotation number (e.g., CU-2026-001)"
                   value={booking.quotation}
-                  onChange={(e) =>
-                    setBooking((b) => ({ ...b, quotation: e.target.value }))
-                  }
+                  onChange={(e) => {
+                    setLookupReady(false);
+                    setLookupError("");
+                    setBooking((b) => ({ ...b, quotation: e.target.value }));
+                  }}
+                  onBlur={(e) => void lookupBooking(e.target.value)}
                 />
+                {lookupLoading && (
+                  <p className="text-sm text-forest-950/55">
+                    Verifying quotation...
+                  </p>
+                )}
+                {lookupError && (
+                  <p className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">
+                    {lookupError}
+                  </p>
+                )}
+                {lookupReady && booking.daysTillArrival != null && (
+                  <div className="rounded-lg border border-blue-100 bg-blue-50/70 px-4 py-3 text-sm text-blue-900">
+                    <p>
+                      <span className="font-semibold">
+                        {booking.daysTillArrival} days
+                      </span>{" "}
+                      until arrival
+                      {booking.arrivalDate ? ` (${booking.arrivalDate})` : ""}.
+                    </p>
+                    {booking.totalPaid != null && booking.totalPaid > 0 && (
+                      <p className="mt-1">
+                        Already paid: USD {booking.totalPaid.toFixed(2)}
+                      </p>
+                    )}
+                  </div>
+                )}
                 <Field
                   icon={Mail}
                   label="Email Address"
@@ -252,12 +335,13 @@ export default function Payments() {
                 />
                 <Field
                   icon={DollarSign}
-                  label="Payment Amount (USD)"
+                  label="Tour Total (USD)"
                   type="number"
                   min="1"
                   step="0.01"
-                  placeholder="Enter the amount from your quotation"
+                  placeholder="Loaded from your quotation"
                   value={booking.amount}
+                  readOnly={lookupReady}
                   onChange={(e) =>
                     setBooking((b) => ({ ...b, amount: e.target.value }))
                   }
@@ -328,9 +412,9 @@ export default function Payments() {
                     Flexible Payment Terms
                   </p>
                   <p className="mt-0.5 text-[13px] text-blue-800/80">
-                    For bookings made less than 90 days before travel, full
-                    payment is required at time of booking. Custom payment
-                    schedules available for tours over USD 5,000.
+                    The 3-step plan (25% / 50% / 25%) applies when travel is 90+
+                    days away. Within 90 days, 75% is due now and 25% at 30 days.
+                    Less than 30 days before travel requires full payment.
                   </p>
                 </div>
               </div>

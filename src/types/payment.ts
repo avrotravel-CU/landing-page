@@ -5,6 +5,10 @@ export type Booking = {
   phone: string;
   amount: string;
   currency: string;
+  arrivalDate?: string;
+  daysTillArrival?: number | null;
+  totalPaid?: number;
+  amountOwed?: number;
   milestoneId?: string;
   paymentAmount?: string;
 };

@@ -37,7 +37,7 @@ export const PAYMENT_TERMS_SECTIONS: TermsSection[] = [
       },
     ],
     paragraphs: [
-      "For bookings made less than 90 days before travel, full payment is required at the time of booking. Custom payment schedules are available for tours over USD 5,000.",
+      "For bookings made less than 30 days before travel, full payment is required at the time of booking.",
     ],
   },
   {

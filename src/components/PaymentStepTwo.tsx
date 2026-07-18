@@ -8,12 +8,13 @@ import {
   useStripe,
 } from "@stripe/react-stripe-js";
 import { CreditCard, HelpCircle } from "lucide-react";
+import { formatUsd } from "../data/paymentMilestones";
 import {
-  formatUsd,
-  getPaymentBreakdown,
-  PAYMENT_MILESTONES,
-  type PaymentMilestoneId,
-} from "../data/paymentMilestones";
+  findPaymentOption,
+  getPaymentSchedule,
+  type PaymentOption,
+  type PaymentOptionId,
+} from "../lib/paymentSchedule";
 import { isStripeConfigured } from "../lib/stripe";
 import {
   generateTransactionRef,
@@ -53,25 +54,33 @@ type Props = {
 };
 
 function MilestoneSelector({
-  tourAmount,
+  options,
   selected,
   onSelect,
 }: {
-  tourAmount: number;
-  selected: PaymentMilestoneId | null;
-  onSelect: (id: PaymentMilestoneId) => void;
+  options: PaymentOption[];
+  selected: PaymentOptionId | null;
+  onSelect: (id: PaymentOptionId) => void;
 }) {
+  if (options.length === 0) {
+    return (
+      <div className="rounded-lg border border-gold-100 bg-gold-50/40 px-4 py-3 text-sm text-forest-950/70">
+        No payment is due right now based on your travel dates and payment
+        history.
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-3">
-      {PAYMENT_MILESTONES.map((milestone) => {
-        const amount = tourAmount * milestone.percent;
-        const active = selected === milestone.id;
+      {options.map((option) => {
+        const active = selected === option.id;
 
         return (
           <button
-            key={milestone.id}
+            key={option.id}
             type="button"
-            onClick={() => onSelect(milestone.id)}
+            onClick={() => onSelect(option.id)}
             className={
               active
                 ? "flex w-full items-center justify-between rounded-lg border border-forest-900/15 border-l-4 border-l-forest-900 bg-forest-900/[0.04] px-4 py-3 text-left transition"
@@ -80,12 +89,12 @@ function MilestoneSelector({
           >
             <div>
               <p className="text-sm font-semibold text-forest-900">
-                {milestone.label}
+                {option.label}
               </p>
-              <p className="text-xs text-forest-950/50">{milestone.timing}</p>
+              <p className="text-xs text-forest-950/50">{option.timing}</p>
             </div>
             <p className="text-sm font-bold text-forest-900">
-              {formatUsd(amount)}
+              {formatUsd(option.paymentAmount)}
             </p>
           </button>
         );
@@ -100,10 +109,21 @@ export default function PaymentStepTwo({ booking, onBack }: Props) {
   const navigate = useNavigate();
   const stripeReady = isStripeConfigured();
 
+  const tourAmount = Number(booking.amount) || 0;
+  const totalPaid = booking.totalPaid ?? 0;
+  const daysTillArrival = booking.daysTillArrival;
+
+  const schedule =
+    daysTillArrival == null
+      ? null
+      : getPaymentSchedule(daysTillArrival, tourAmount, totalPaid);
+
   const [method, setMethod] = useState("Visa");
-  const [milestoneId, setMilestoneId] = useState<PaymentMilestoneId | null>(
-    null
-  );
+  const [milestoneId, setMilestoneId] = useState<PaymentOptionId | null>(() => {
+    if (!schedule) return null;
+    if (schedule.options.length === 1) return schedule.options[0].id;
+    return null;
+  });
   const [nameOnCard, setNameOnCard] = useState(booking.name);
   const [cardNumber, setCardNumber] = useState("");
   const [cardMonth, setCardMonth] = useState("");
@@ -115,10 +135,10 @@ export default function PaymentStepTwo({ booking, onBack }: Props) {
   const [processing, setProcessing] = useState(false);
   const [error, setError] = useState("");
 
-  const tourAmount = Number(booking.amount) || 0;
-  const breakdown = milestoneId
-    ? getPaymentBreakdown(tourAmount, milestoneId)
-    : null;
+  const selectedOption =
+    schedule && milestoneId
+      ? findPaymentOption(schedule, milestoneId)
+      : null;
 
   const nativeCardValid = Boolean(
     nameOnCard.trim() &&
@@ -130,22 +150,21 @@ export default function PaymentStepTwo({ booking, onBack }: Props) {
 
   const stripeCardValid = Boolean(stripe && elements && nameOnCard.trim());
   const cardValid = stripeReady ? stripeCardValid : nativeCardValid;
-  const formReady = Boolean(milestoneId && cardValid && !processing);
+  const formReady = Boolean(selectedOption && cardValid && !processing);
   const canSubmit = formReady && agreed;
 
   async function syncPaymentToSheet(result: PaymentResultState) {
-    if (!breakdown || !milestoneId) return;
+    if (!selectedOption || !milestoneId) return;
 
-    const milestone = PAYMENT_MILESTONES.find((m) => m.id === milestoneId);
     try {
       await fetch("/api/record-payment", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           quotation: booking.quotation,
-          paymentAmount: breakdown.paymentAmount,
+          paymentAmount: selectedOption.paymentAmount,
           milestone: milestoneId,
-          milestoneLabel: milestone?.label,
+          milestoneLabel: selectedOption.label,
           name: booking.name,
           email: booking.email,
           transactionRef: result.transactionRef,
@@ -162,7 +181,7 @@ export default function PaymentStepTwo({ booking, onBack }: Props) {
       booking: {
         ...booking,
         milestoneId: milestoneId ?? undefined,
-        paymentAmount: breakdown?.paymentAmount.toFixed(2),
+        paymentAmount: selectedOption?.paymentAmount.toFixed(2),
       },
       card,
       transactionRef: generateTransactionRef(),
@@ -170,7 +189,7 @@ export default function PaymentStepTwo({ booking, onBack }: Props) {
   }
 
   async function processStripePayment() {
-    if (!stripe || !elements || !breakdown) return;
+    if (!stripe || !elements || !selectedOption || !milestoneId) return;
 
     const cardElement = elements.getElement(CardNumberElement);
     if (!cardElement) {
@@ -186,7 +205,7 @@ export default function PaymentStepTwo({ booking, onBack }: Props) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          amount: breakdown.paymentAmount,
+          amount: selectedOption.paymentAmount,
           currency: booking.currency,
           quotation: booking.quotation,
           email: booking.email,
@@ -242,7 +261,7 @@ export default function PaymentStepTwo({ booking, onBack }: Props) {
   }
 
   async function processDemoPayment() {
-    if (!breakdown) return;
+    if (!selectedOption) return;
 
     const result = buildResult({
       method,
@@ -300,170 +319,190 @@ export default function PaymentStepTwo({ booking, onBack }: Props) {
             Choose a payment method and click Continue...
           </p>
 
-          <form onSubmit={handleSubmit} className="mt-4 space-y-5">
-            <MilestoneSelector
-              tourAmount={tourAmount}
-              selected={milestoneId}
-              onSelect={setMilestoneId}
-            />
-
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-              {PAYMENT_METHODS.map((m) => (
-                <button
-                  key={m.id}
-                  type="button"
-                  onClick={() => setMethod(m.id)}
-                  className={
-                    m.id === method
-                      ? "rounded-lg border-2 border-blue-500 bg-blue-50 px-3 py-2.5 text-sm font-bold text-blue-700"
-                      : "rounded-lg border border-forest-900/15 bg-white px-3 py-2.5 text-sm font-bold text-forest-950/70 transition hover:border-forest-900/30"
-                  }
-                >
-                  {m.label}
-                </button>
-              ))}
-            </div>
-
-            <div className="rounded-xl border border-forest-900/15 p-5">
-              <div className="flex items-center gap-2">
-                <CreditCard size={20} className="text-blue-600" />
-                <h3 className="text-lg font-bold text-blue-600">Credit Card</h3>
+          {daysTillArrival == null ? (
+            <p className="mt-4 rounded-lg bg-amber-50 px-4 py-3 text-sm text-amber-900">
+              We could not determine your travel dates from this quotation.
+              Go back and verify your quotation number, or contact us for help.
+            </p>
+          ) : (
+            <>
+              <div className="mt-4 rounded-lg border border-blue-100 bg-blue-50/70 px-4 py-3 text-sm text-blue-900">
+                <p>
+                  <span className="font-semibold">{daysTillArrival} days</span>{" "}
+                  until arrival
+                  {booking.arrivalDate ? ` (${booking.arrivalDate})` : ""}.
+                </p>
+                {schedule?.scheduleNote && (
+                  <p className="mt-1 text-blue-800/85">{schedule.scheduleNote}</p>
+                )}
               </div>
-              <p className="mt-3 text-sm text-forest-950/70">
-                To pay by credit card, please fill out the fields below.
-              </p>
 
-              <div className="mt-4 space-y-4">
-                <div className="flex flex-wrap items-center gap-3">
-                  <label className="w-36 shrink-0 text-sm font-semibold text-forest-900">
-                    Name on card:
-                  </label>
-                  <input
-                    value={nameOnCard}
-                    onChange={(e) => setNameOnCard(e.target.value)}
-                    className="min-w-0 flex-1 rounded-lg border border-forest-900/15 px-3 py-2 text-sm text-forest-950 outline-none transition focus:border-blue-400"
-                  />
+              <form onSubmit={handleSubmit} className="mt-4 space-y-5">
+                <MilestoneSelector
+                  options={schedule?.options ?? []}
+                  selected={milestoneId}
+                  onSelect={setMilestoneId}
+                />
+
+                <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                  {PAYMENT_METHODS.map((m) => (
+                    <button
+                      key={m.id}
+                      type="button"
+                      onClick={() => setMethod(m.id)}
+                      className={
+                        m.id === method
+                          ? "rounded-lg border-2 border-blue-500 bg-blue-50 px-3 py-2.5 text-sm font-bold text-blue-700"
+                          : "rounded-lg border border-forest-900/15 bg-white px-3 py-2.5 text-sm font-bold text-forest-950/70 transition hover:border-forest-900/30"
+                      }
+                    >
+                      {m.label}
+                    </button>
+                  ))}
                 </div>
 
-                <div className="flex flex-wrap items-center gap-3">
-                  <label className="w-36 shrink-0 text-sm font-semibold text-forest-900">
-                    Card Number:
-                  </label>
-                  {stripeReady ? (
-                    <div className="min-w-0 flex-1 rounded-lg border border-forest-900/15 px-3 py-2.5">
-                      <CardNumberElement
-                        options={{ style: STRIPE_ELEMENT_STYLE }}
+                <div className="rounded-xl border border-forest-900/15 p-5">
+                  <div className="flex items-center gap-2">
+                    <CreditCard size={20} className="text-blue-600" />
+                    <h3 className="text-lg font-bold text-blue-600">Credit Card</h3>
+                  </div>
+                  <p className="mt-3 text-sm text-forest-950/70">
+                    To pay by credit card, please fill out the fields below.
+                  </p>
+
+                  <div className="mt-4 space-y-4">
+                    <div className="flex flex-wrap items-center gap-3">
+                      <label className="w-36 shrink-0 text-sm font-semibold text-forest-900">
+                        Name on card:
+                      </label>
+                      <input
+                        value={nameOnCard}
+                        onChange={(e) => setNameOnCard(e.target.value)}
+                        className="min-w-0 flex-1 rounded-lg border border-forest-900/15 px-3 py-2 text-sm text-forest-950 outline-none transition focus:border-blue-400"
                       />
                     </div>
-                  ) : (
-                    <input
-                      placeholder="1234 5678 9012 3456"
-                      inputMode="numeric"
-                      value={cardNumber}
-                      onChange={(e) => setCardNumber(e.target.value)}
-                      className="min-w-0 flex-1 rounded-lg border border-forest-900/15 px-3 py-2 text-sm text-forest-950 placeholder:text-forest-950/35 outline-none transition focus:border-blue-400"
-                    />
-                  )}
+
+                    <div className="flex flex-wrap items-center gap-3">
+                      <label className="w-36 shrink-0 text-sm font-semibold text-forest-900">
+                        Card Number:
+                      </label>
+                      {stripeReady ? (
+                        <div className="min-w-0 flex-1 rounded-lg border border-forest-900/15 px-3 py-2.5">
+                          <CardNumberElement
+                            options={{ style: STRIPE_ELEMENT_STYLE }}
+                          />
+                        </div>
+                      ) : (
+                        <input
+                          placeholder="1234 5678 9012 3456"
+                          inputMode="numeric"
+                          value={cardNumber}
+                          onChange={(e) => setCardNumber(e.target.value)}
+                          className="min-w-0 flex-1 rounded-lg border border-forest-900/15 px-3 py-2 text-sm text-forest-950 placeholder:text-forest-950/35 outline-none transition focus:border-blue-400"
+                        />
+                      )}
+                    </div>
+
+                    <div className="flex flex-wrap items-center gap-3">
+                      <label className="w-36 shrink-0 text-sm font-semibold text-forest-900">
+                        Expiration Date:
+                      </label>
+                      {stripeReady ? (
+                        <div className="rounded-lg border border-forest-900/15 px-3 py-2.5">
+                          <CardExpiryElement
+                            options={{ style: STRIPE_ELEMENT_STYLE }}
+                          />
+                        </div>
+                      ) : (
+                        <>
+                          <select
+                            value={cardMonth}
+                            onChange={(e) => setCardMonth(e.target.value)}
+                            className="rounded-lg border border-forest-900/15 px-3 py-2 text-sm text-forest-950 outline-none transition focus:border-blue-400"
+                          >
+                            <option value="">Month</option>
+                            {MONTHS.map((m) => (
+                              <option key={m} value={m}>
+                                {m}
+                              </option>
+                            ))}
+                          </select>
+                          <select
+                            value={cardYear}
+                            onChange={(e) => setCardYear(e.target.value)}
+                            className="rounded-lg border border-forest-900/15 px-3 py-2 text-sm text-forest-950 outline-none transition focus:border-blue-400"
+                          >
+                            <option value="">Year</option>
+                            {YEARS.map((y) => (
+                              <option key={y} value={y}>
+                                {y}
+                              </option>
+                            ))}
+                          </select>
+                        </>
+                      )}
+                    </div>
+
+                    <div className="flex flex-wrap items-center gap-3">
+                      <label className="w-36 shrink-0 text-sm font-semibold text-forest-900">
+                        Security Code:
+                      </label>
+                      {stripeReady ? (
+                        <div className="w-24 rounded-lg border border-forest-900/15 px-3 py-2.5">
+                          <CardCvcElement options={{ style: STRIPE_ELEMENT_STYLE }} />
+                        </div>
+                      ) : (
+                        <input
+                          placeholder="CVV"
+                          inputMode="numeric"
+                          value={cardCvc}
+                          onChange={(e) => setCardCvc(e.target.value)}
+                          className="w-24 rounded-lg border border-forest-900/15 px-3 py-2 text-sm text-forest-950 placeholder:text-forest-950/35 outline-none transition focus:border-blue-400"
+                        />
+                      )}
+                      <a
+                        href="#"
+                        onClick={(e) => e.preventDefault()}
+                        className="inline-flex items-center gap-1 text-sm font-medium text-blue-600 hover:underline"
+                      >
+                        <HelpCircle size={14} /> help
+                      </a>
+                    </div>
+                  </div>
                 </div>
 
-                <div className="flex flex-wrap items-center gap-3">
-                  <label className="w-36 shrink-0 text-sm font-semibold text-forest-900">
-                    Expiration Date:
-                  </label>
-                  {stripeReady ? (
-                    <div className="rounded-lg border border-forest-900/15 px-3 py-2.5">
-                      <CardExpiryElement
-                        options={{ style: STRIPE_ELEMENT_STYLE }}
-                      />
-                    </div>
-                  ) : (
-                    <>
-                      <select
-                        value={cardMonth}
-                        onChange={(e) => setCardMonth(e.target.value)}
-                        className="rounded-lg border border-forest-900/15 px-3 py-2 text-sm text-forest-950 outline-none transition focus:border-blue-400"
-                      >
-                        <option value="">Month</option>
-                        {MONTHS.map((m) => (
-                          <option key={m} value={m}>
-                            {m}
-                          </option>
-                        ))}
-                      </select>
-                      <select
-                        value={cardYear}
-                        onChange={(e) => setCardYear(e.target.value)}
-                        className="rounded-lg border border-forest-900/15 px-3 py-2 text-sm text-forest-950 outline-none transition focus:border-blue-400"
-                      >
-                        <option value="">Year</option>
-                        {YEARS.map((y) => (
-                          <option key={y} value={y}>
-                            {y}
-                          </option>
-                        ))}
-                      </select>
-                    </>
-                  )}
-                </div>
+                {error && (
+                  <p className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">
+                    {error}
+                  </p>
+                )}
 
-                <div className="flex flex-wrap items-center gap-3">
-                  <label className="w-36 shrink-0 text-sm font-semibold text-forest-900">
-                    Security Code:
-                  </label>
-                  {stripeReady ? (
-                    <div className="w-24 rounded-lg border border-forest-900/15 px-3 py-2.5">
-                      <CardCvcElement options={{ style: STRIPE_ELEMENT_STYLE }} />
-                    </div>
-                  ) : (
-                    <input
-                      placeholder="CVV"
-                      inputMode="numeric"
-                      value={cardCvc}
-                      onChange={(e) => setCardCvc(e.target.value)}
-                      className="w-24 rounded-lg border border-forest-900/15 px-3 py-2 text-sm text-forest-950 placeholder:text-forest-950/35 outline-none transition focus:border-blue-400"
-                    />
-                  )}
-                  <a
-                    href="#"
-                    onClick={(e) => e.preventDefault()}
-                    className="inline-flex items-center gap-1 text-sm font-medium text-blue-600 hover:underline"
+                <div className="flex gap-3 pt-1">
+                  <button
+                    type="button"
+                    onClick={onBack}
+                    disabled={processing}
+                    className="flex-1 rounded-full border border-forest-900 px-6 py-3 text-sm font-semibold text-forest-900 transition hover:bg-forest-900/5 disabled:opacity-50"
                   >
-                    <HelpCircle size={14} /> help
-                  </a>
+                    Back
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={!formReady}
+                    className={
+                      formReady
+                        ? canSubmit
+                          ? "flex-1 rounded-full bg-forest-900 px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-forest-800"
+                          : "flex-1 rounded-full bg-green-200 px-6 py-3 text-sm font-semibold text-white/90 transition hover:bg-green-300"
+                        : "flex-1 cursor-not-allowed rounded-full bg-green-200 px-6 py-3 text-sm font-semibold text-white/90"
+                    }
+                  >
+                    {processing ? "Processing..." : "Continue..."}
+                  </button>
                 </div>
-              </div>
-            </div>
-
-            {error && (
-              <p className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">
-                {error}
-              </p>
-            )}
-
-            <div className="flex gap-3 pt-1">
-              <button
-                type="button"
-                onClick={onBack}
-                disabled={processing}
-                className="flex-1 rounded-full border border-forest-900 px-6 py-3 text-sm font-semibold text-forest-900 transition hover:bg-forest-900/5 disabled:opacity-50"
-              >
-                Back
-              </button>
-              <button
-                type="submit"
-                disabled={!formReady}
-                className={
-                  formReady
-                    ? canSubmit
-                      ? "flex-1 rounded-full bg-forest-900 px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-forest-800"
-                      : "flex-1 rounded-full bg-green-200 px-6 py-3 text-sm font-semibold text-white/90 transition hover:bg-green-300"
-                    : "flex-1 cursor-not-allowed rounded-full bg-green-200 px-6 py-3 text-sm font-semibold text-white/90"
-                }
-              >
-                {processing ? "Processing..." : "Continue..."}
-              </button>
-            </div>
-          </form>
+              </form>
+            </>
+          )}
         </div>
 
         <div className="rounded-2xl border border-gold-100 bg-white p-6 shadow-sm sm:p-8">
@@ -499,7 +538,10 @@ export default function PaymentStepTwo({ booking, onBack }: Props) {
         />
       </div>
 
-      <PaymentSummarySidebar booking={booking} milestoneId={milestoneId} />
+      <PaymentSummarySidebar
+        booking={booking}
+        selectedOption={selectedOption}
+      />
     </div>
   );
 }

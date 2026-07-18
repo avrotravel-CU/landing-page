@@ -1,3 +1,29 @@
+import { isValidPaymentOption } from "./payment-schedule.js";
+
+async function lookupBooking(quotation) {
+  const scriptUrl = process.env.GOOGLE_APPS_SCRIPT_URL;
+  const sharedSecret = process.env.GOOGLE_APPS_SCRIPT_SECRET;
+  if (!scriptUrl || !sharedSecret) return null;
+
+  const scriptResponse = await fetch(scriptUrl, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      action: "lookupBooking",
+      secret: sharedSecret,
+      quotation,
+    }),
+  });
+
+  const text = await scriptResponse.text();
+  try {
+    const parsed = JSON.parse(text);
+    return parsed?.ok === true ? parsed : null;
+  } catch {
+    return null;
+  }
+}
+
 // Records a successful payment against the matching Plan My Trip row on Sheet1
 // (same Google Sheet + Apps Script Web App as /api/submit-trip).
 
@@ -20,12 +46,43 @@ export default async function handler(req, res) {
     const body = req.body && typeof req.body === "object" ? req.body : {};
     const quotation = String(body.quotation || "").trim();
     const paymentAmount = Number(body.paymentAmount);
+    const milestone = String(body.milestone || "").trim();
 
     if (!quotation) {
       return res.status(400).json({ error: "Quotation number is required" });
     }
     if (!paymentAmount || paymentAmount <= 0) {
       return res.status(400).json({ error: "A valid payment amount is required" });
+    }
+    if (!milestone) {
+      return res.status(400).json({ error: "Payment milestone is required" });
+    }
+
+    const booking = await lookupBooking(quotation);
+    if (!booking) {
+      return res.status(400).json({
+        error: "Could not verify booking schedule. Check your quotation number.",
+      });
+    }
+
+    if (booking.daysTillArrival == null) {
+      return res.status(400).json({
+        error: "Arrival date is missing for this booking.",
+      });
+    }
+
+    const valid = isValidPaymentOption(
+      booking.daysTillArrival,
+      booking.tourAmount,
+      booking.totalPaid,
+      milestone,
+      paymentAmount
+    );
+
+    if (!valid) {
+      return res.status(400).json({
+        error: "This payment amount is not allowed for your booking schedule.",
+      });
     }
 
     const scriptResponse = await fetch(scriptUrl, {
