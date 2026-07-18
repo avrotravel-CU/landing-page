@@ -1472,15 +1472,6 @@ export default function Plan() {
                       </p>
                     )}
 
-                    {!canSubmit && !submitting && (
-                      <p className="rounded-lg border border-gold-200 bg-gold-50/80 px-4 py-2.5 text-sm text-forest-900">
-                        <span className="font-semibold">
-                          Scroll up to complete required fields:
-                        </span>{" "}
-                        {missingRequired.join(" · ")}
-                      </p>
-                    )}
-
                     <button
                       type="submit"
                       disabled={!canSubmit || submitting}
