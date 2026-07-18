@@ -13,12 +13,12 @@ import avatarPatel from "../assets/testimonials/avatar_patel.jpg";
 
 import sarahCooking1 from "../assets/testimonials/reviews/sarah_cooking_1.jpg";
 import sarahCooking2 from "../assets/testimonials/reviews/sarah_cooking_2.jpg";
-import jamesElephants from "../assets/experiences/visit_sri_Lanka_Elephant_Safari_Udawalawe.jpg";
-import jamesPinnawala from "../assets/experiences/visit_sri_Lanka_Pinnawala_Elephant_Orphanage.jpg";
-import mariaAdamsPeak from "../assets/experiences/visit_sri_Lanka_Hike_Adams_Peak.jpg";
-import mariaSigiriya from "../assets/experiences/visit_sri_Lanka_Sigiriya_Lion_Rock.jpg";
-import patelAyurveda from "../assets/experiences/visit_sri_Lanka_Ayurveda_Retreat.jpg";
-import patelHerbal from "../assets/experiences/visit_sri_Lanka_Herbal_Garden_Walk.jpg";
+import jamesElephants1 from "../assets/testimonials/reviews/james_elephants_1.jpg";
+import jamesElephants2 from "../assets/testimonials/reviews/james_elephants_2.jpg";
+import mariaAdamsPeak1 from "../assets/testimonials/reviews/maria_adams_peak_1.png";
+import mariaAdamsPeak2 from "../assets/testimonials/reviews/maria_adams_peak_2.png";
+import patelAyurveda1 from "../assets/testimonials/reviews/patel_ayurveda_1.jpg";
+import patelAyurveda2 from "../assets/testimonials/reviews/patel_ayurveda_2.jpg";
 
 export type Testimonial = {
   name: string;
@@ -49,7 +49,7 @@ export const testimonials: Testimonial[] = [
     location: "London, UK",
     visited: "August 2025",
     avatar: avatarJames,
-    photos: [jamesElephants, jamesPinnawala],
+    photos: [jamesElephants1, jamesElephants2],
     quote:
       "Watching a herd of 60+ elephants at Udawalawe was surreal. No fences, no enclosures, just wild elephants living freely. Our guide knew every waterhole and we saw mothers with calves, bulls sparring, it was nature at its finest.",
     rating: 5,
@@ -60,7 +60,7 @@ export const testimonials: Testimonial[] = [
     location: "Barcelona, Spain",
     visited: "January 2026",
     avatar: avatarMariaCarlos,
-    photos: [mariaAdamsPeak, mariaSigiriya],
+    photos: [mariaAdamsPeak1, mariaAdamsPeak2],
     quote:
       "We climbed Adam's Peak at 2am under a sky full of stars. Reaching the summit at sunrise with thousands of pilgrims from all faiths was deeply moving. It wasn't just a hike, it was a spiritual journey we'll never forget.",
     rating: 5,
@@ -71,7 +71,7 @@ export const testimonials: Testimonial[] = [
     location: "Toronto, Canada",
     visited: "June 2025",
     avatar: avatarPatel,
-    photos: [patelAyurveda, patelHerbal],
+    photos: [patelAyurveda1, patelAyurveda2],
     quote:
       "The Ayurveda retreat was exactly what we needed after months of stress. Authentic treatments using traditional methods, herbal oils prepared fresh daily, and therapists who truly understood healing. We left feeling renewed, body and soul.",
     rating: 5,
