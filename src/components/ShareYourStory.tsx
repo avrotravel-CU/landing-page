@@ -1,6 +1,7 @@
 import { useRef, useState, type DragEvent, type FormEvent } from "react";
 import { Star, Send, Upload, X } from "lucide-react";
 import { encodeReviewPhotos } from "../lib/reviewPhotos";
+import { COUNTRIES } from "../data/countries";
 
 const MONTHS = [
   "January",
@@ -150,13 +151,19 @@ export default function ShareYourStory({ onSubmitted }: Props) {
                 <span className="mb-1.5 block text-sm font-semibold text-forest-900">
                   Country <span className="text-red-500">*</span>
                 </span>
-                <input
+                <select
                   required
                   value={country}
                   onChange={(e) => setCountry(e.target.value)}
-                  placeholder="e.g. Australia"
-                  className="w-full rounded-lg border border-forest-900/15 px-4 py-2.5 text-sm text-forest-950 placeholder:text-forest-950/35 outline-none transition focus:border-gold-400"
-                />
+                  className="w-full rounded-lg border border-forest-900/15 bg-white px-4 py-2.5 text-sm text-forest-950 outline-none transition focus:border-gold-400"
+                >
+                  <option value="">Select country</option>
+                  {COUNTRIES.map((c) => (
+                    <option key={c} value={c}>
+                      {c}
+                    </option>
+                  ))}
+                </select>
               </label>
             </div>
 

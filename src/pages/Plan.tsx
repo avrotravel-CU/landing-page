@@ -8,24 +8,7 @@ import {
   Send,
 } from "lucide-react";
 import planCollage from "../assets/plan-collage.jpg";
-
-const COUNTRIES = [
-  "United States",
-  "United Kingdom",
-  "Canada",
-  "Australia",
-  "Germany",
-  "France",
-  "Netherlands",
-  "India",
-  "Singapore",
-  "United Arab Emirates",
-  "Japan",
-  "China",
-  "New Zealand",
-  "South Africa",
-  "Other",
-];
+import { COUNTRIES } from "../data/countries";
 
 const DAYS_OPTIONS = [
   "1-3 Days",
