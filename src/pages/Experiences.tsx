@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
+import CustomerReviewsSection from "../components/CustomerReviewsSection";
 import ShareYourStory from "../components/ShareYourStory";
-import TravelerReviewCard from "../components/TravelerReviewCard";
 import {
   experiences,
   experienceCategories,
@@ -21,6 +21,8 @@ function mapCustomerReview(r: CustomerReview): Testimonial {
     quote: r.quote,
     rating: r.rating,
     photos: r.photos,
+    submittedAt: r.submittedAt,
+    verified: true,
   };
 }
 
@@ -139,20 +141,11 @@ export default function Experiences() {
 
       <section className="bg-cream-100">
         <div className="mx-auto max-w-7xl px-6 py-16 lg:px-10 lg:py-20">
-          <div className="text-center">
-            <h2 className="font-serif text-2xl font-bold text-forest-900 sm:text-3xl">
-              Hear From Our Travelers
-            </h2>
-            <p className="mt-2 text-sm text-forest-950/60">
-              Real experiences from real people
-            </p>
-          </div>
+          <h2 className="font-serif text-2xl font-bold text-forest-900 sm:text-3xl">
+            Customer Reviews
+          </h2>
 
-          <div className="mt-10 grid grid-cols-1 gap-8 lg:grid-cols-2">
-            {displayedReviews.map((t) => (
-              <TravelerReviewCard key={t.id ?? t.name} review={t} />
-            ))}
-          </div>
+          <CustomerReviewsSection reviews={displayedReviews} />
 
           <ShareYourStory onSubmitted={refreshReviews} />
 

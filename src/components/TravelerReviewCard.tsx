@@ -4,6 +4,7 @@ import ReviewPhoto from "./ReviewPhoto";
 
 type Props = {
   review: Testimonial;
+  layout?: "grid" | "carousel";
 };
 
 function initialsFor(name: string) {
@@ -15,17 +16,22 @@ function initialsFor(name: string) {
     .join("");
 }
 
-export default function TravelerReviewCard({ review }: Props) {
+export default function TravelerReviewCard({ review, layout = "grid" }: Props) {
   const { name, location, avatar, quote, rating, photos = [], visited } = review;
-  const visiblePhotos = photos.slice(0, 5);
+  const isCarousel = layout === "carousel";
+  const visiblePhotos = isCarousel ? photos.slice(0, 1) : photos.slice(0, 5);
   const initials = initialsFor(name);
 
   return (
-    <article className="overflow-hidden rounded-xl border border-gold-100 bg-white shadow-sm">
+    <article
+      className={`flex h-full flex-col overflow-hidden rounded-xl border border-gold-100 bg-white shadow-sm ${
+        isCarousel ? "min-h-[420px]" : ""
+      }`}
+    >
       {visiblePhotos.length > 0 && (
         <div
           className={
-            visiblePhotos.length === 1
+            isCarousel || visiblePhotos.length === 1
               ? ""
               : visiblePhotos.length === 2
                 ? "grid grid-cols-2 gap-0.5"
@@ -38,8 +44,8 @@ export default function TravelerReviewCard({ review }: Props) {
               src={src}
               alt={`${name} — photo ${i + 1}`}
               className={
-                visiblePhotos.length === 1
-                  ? "h-48 w-full object-cover sm:h-52"
+                isCarousel || visiblePhotos.length === 1
+                  ? "h-44 w-full object-cover"
                   : "aspect-[4/3] w-full object-cover"
               }
             />
@@ -47,7 +53,7 @@ export default function TravelerReviewCard({ review }: Props) {
         </div>
       )}
 
-      <div className="p-6">
+      <div className={`flex flex-1 flex-col ${isCarousel ? "p-5" : "p-6"}`}>
         <div className="flex items-center gap-3">
           {avatar ? (
             <img
@@ -72,7 +78,11 @@ export default function TravelerReviewCard({ review }: Props) {
           </div>
         </div>
 
-        <p className="mt-4 text-[13px] leading-relaxed text-forest-950/70">
+        <p
+          className={`mt-3 flex-1 text-[13px] leading-relaxed text-forest-950/70 ${
+            isCarousel ? "line-clamp-5" : ""
+          }`}
+        >
           &ldquo;{quote}&rdquo;
         </p>
 

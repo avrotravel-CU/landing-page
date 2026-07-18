@@ -29,6 +29,8 @@ export type Testimonial = {
   photos?: string[];
   visited?: string;
   id?: string;
+  submittedAt?: string;
+  verified?: boolean;
 };
 
 export const testimonials: Testimonial[] = [
@@ -40,6 +42,7 @@ export const testimonials: Testimonial[] = [
     quote:
       "The cooking class in a local home was absolutely unforgettable. Learning to make hoppers from scratch while hearing stories about family recipes passed down generations, that's the real Ceylon. Our host treated us like family, not tourists.",
     rating: 5,
+    verified: true,
   },
   {
     name: "James Mitchell",
@@ -50,6 +53,7 @@ export const testimonials: Testimonial[] = [
     quote:
       "Watching a herd of 60+ elephants at Udawalawe was surreal. No fences, no enclosures, just wild elephants living freely. Our guide knew every waterhole and we saw mothers with calves, bulls sparring, it was nature at its finest.",
     rating: 5,
+    verified: true,
   },
   {
     name: "Maria & Carlos Rodriguez",
@@ -60,6 +64,7 @@ export const testimonials: Testimonial[] = [
     quote:
       "We climbed Adam's Peak at 2am under a sky full of stars. Reaching the summit at sunrise with thousands of pilgrims from all faiths was deeply moving. It wasn't just a hike, it was a spiritual journey we'll never forget.",
     rating: 5,
+    verified: true,
   },
   {
     name: "The Patel Family",
@@ -70,5 +75,6 @@ export const testimonials: Testimonial[] = [
     quote:
       "The Ayurveda retreat was exactly what we needed after months of stress. Authentic treatments using traditional methods, herbal oils prepared fresh daily, and therapists who truly understood healing. We left feeling renewed, body and soul.",
     rating: 5,
+    verified: true,
   },
 ];
