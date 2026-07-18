@@ -1,4 +1,4 @@
-import { useRef, useState, type FormEvent, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type FormEvent, type ReactNode } from "react";
 import {
   MapPin,
   Calendar,
@@ -18,6 +18,37 @@ const DAYS_OPTIONS = [
   "15-21 Days",
   "22+ Days",
 ];
+
+function parseDateOnly(value: string): Date | null {
+  const [year, month, day] = value.split("-").map(Number);
+  if (!year || !month || !day) return null;
+  const date = new Date(year, month - 1, day);
+  if (
+    date.getFullYear() !== year ||
+    date.getMonth() !== month - 1 ||
+    date.getDate() !== day
+  ) {
+    return null;
+  }
+  return date;
+}
+
+function calculateTripDays(arrival: string, departure: string): number {
+  const start = parseDateOnly(arrival);
+  const end = parseDateOnly(departure);
+  if (!start || !end) return 0;
+  const diffMs = end.getTime() - start.getTime();
+  return Math.floor(diffMs / (1000 * 60 * 60 * 24)) + 1;
+}
+
+function daysOptionForCount(count: number): string {
+  if (count <= 3) return "1-3 Days";
+  if (count <= 6) return "4-6 Days";
+  if (count <= 9) return "7-9 Days";
+  if (count <= 14) return "10-14 Days";
+  if (count <= 21) return "15-21 Days";
+  return "22+ Days";
+}
 
 const ADULTS_OPTIONS = ["1", "2", "3", "4", "5", "6+"];
 
@@ -213,7 +244,10 @@ function TextInput(
   );
 }
 
-function DateInput(props: React.InputHTMLAttributes<HTMLInputElement>) {
+function DateInput({
+  onChange,
+  ...props
+}: React.InputHTMLAttributes<HTMLInputElement>) {
   const inputRef = useRef<HTMLInputElement>(null);
 
   function openPicker() {
@@ -231,12 +265,21 @@ function DateInput(props: React.InputHTMLAttributes<HTMLInputElement>) {
     el.focus();
   }
 
+  function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
+    onChange?.(e);
+    if (e.currentTarget.value) {
+      // Defer blur so Chrome closes the native date picker after selection.
+      window.setTimeout(() => e.currentTarget.blur(), 0);
+    }
+  }
+
   return (
     <div className="relative">
       <input
         {...props}
         ref={inputRef}
         type="date"
+        onChange={handleChange}
         className="w-full rounded-lg border border-forest-900/15 px-4 py-2.5 pr-10 text-sm text-forest-950 outline-none transition [color-scheme:light] focus:border-gold-400"
       />
       <button
@@ -472,6 +515,20 @@ export default function Plan() {
   })();
 
   const canSubmit = missingRequired.length === 0;
+
+  const tripDayCount = useMemo(() => {
+    if (!arrival || !departure) return null;
+    return calculateTripDays(arrival, departure);
+  }, [arrival, departure]);
+
+  useEffect(() => {
+    if (tripDayCount === null) return;
+    if (tripDayCount > 0) {
+      setDays(daysOptionForCount(tripDayCount));
+    } else {
+      setDays("");
+    }
+  }, [tripDayCount]);
 
   function orNone(value: string): string {
     return value.trim() ? value : "None specified";
@@ -778,6 +835,17 @@ export default function Plan() {
                         value={days}
                         onChange={(e) => setDays(e.target.value)}
                       />
+                      {tripDayCount !== null && tripDayCount <= 0 && (
+                        <p className="mt-1 text-xs text-red-600">
+                          Departure must be on or after arrival.
+                        </p>
+                      )}
+                      {tripDayCount !== null && tripDayCount > 0 && (
+                        <p className="mt-1 text-xs text-forest-950/50">
+                          {tripDayCount} {tripDayCount === 1 ? "day" : "days"} in
+                          Sri Lanka (auto-calculated from your dates)
+                        </p>
+                      )}
                     </label>
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                       <label className="block">
