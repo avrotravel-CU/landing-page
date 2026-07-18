@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import logo from "../assets/logo.png";
+import { pageTitleForPath } from "../lib/pageTitles";
 
 const NAV_LINKS = [
   { label: "Home", href: "/" },
@@ -14,6 +15,7 @@ const NAV_LINKS = [
 export default function Header() {
   const [open, setOpen] = useState(false);
   const { pathname } = useLocation();
+  const pageName = pageTitleForPath(pathname);
 
   const isActive = (href: string) => href === pathname;
 
@@ -28,7 +30,7 @@ export default function Header() {
           />
           <span className="mx-1 hidden h-10 w-px bg-forest-900/15 sm:block" />
           <span className="hidden text-[13px] font-medium text-gold-500 sm:block">
-            Sri Lanka, for you.
+            Ceylon Unscripted - {pageName}
           </span>
         </Link>
 
