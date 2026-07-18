@@ -4,6 +4,10 @@
   "headers": [
     {
       "source": "/favicon.ico",
+      "headers": [{ "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" }]
+    },
+    {
+      "source": "/ceylon-shell-icon.png",
       "headers": [{ "key": "Cache-Control", "value": "public, max-age=3600, must-revalidate" }]
     },
     {
@@ -17,7 +21,7 @@
   ],
   "rewrites": [
     {
-      "source": "/((?!assets/|favicon\\.ico|favicon.*\\.png|apple-touch-icon\\.png|icons\\.svg|site\\.webmanifest).*)",
+      "source": "/((?!assets/|favicon\\.ico|favicon.*\\.png|ceylon-shell-icon\\.png|apple-touch-icon\\.png|icons\\.svg|site\\.webmanifest).*)",
       "destination": "/index.html"
     }
   ]
