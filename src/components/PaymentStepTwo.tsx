@@ -23,6 +23,7 @@ import {
   type PaymentResultState,
 } from "../types/payment";
 import PaymentSummarySidebar from "./PaymentSummarySidebar";
+import { PaymentTermsAccordion, PaymentTermsModal } from "./PaymentTerms";
 
 const STRIPE_ELEMENT_STYLE = {
   base: {
@@ -128,6 +129,9 @@ export default function PaymentStepTwo({ booking, onBack }: Props) {
   const [cardMonth, setCardMonth] = useState("");
   const [cardYear, setCardYear] = useState("");
   const [cardCvc, setCardCvc] = useState("");
+  const [termsOpen, setTermsOpen] = useState(false);
+  const [agreed, setAgreed] = useState(false);
+  const [termsModalOpen, setTermsModalOpen] = useState(false);
   const [processing, setProcessing] = useState(false);
   const [error, setError] = useState("");
 
@@ -147,6 +151,7 @@ export default function PaymentStepTwo({ booking, onBack }: Props) {
   const stripeCardValid = Boolean(stripe && elements && nameOnCard.trim());
   const cardValid = stripeReady ? stripeCardValid : nativeCardValid;
   const formReady = Boolean(selectedOption && cardValid && !processing);
+  const canSubmit = formReady && agreed;
 
   async function syncPaymentToSheet(result: PaymentResultState) {
     if (!selectedOption || !milestoneId) return;
@@ -289,7 +294,21 @@ export default function PaymentStepTwo({ booking, onBack }: Props) {
   function handleSubmit(e: FormEvent) {
     e.preventDefault();
     if (!formReady) return;
+
+    if (!agreed) {
+      setTermsModalOpen(true);
+      return;
+    }
+
     void processPayment();
+  }
+
+  function handleTermsAccept() {
+    setAgreed(true);
+    setTermsModalOpen(false);
+    if (milestoneId && cardValid) {
+      void processPayment();
+    }
   }
 
   return (
@@ -472,7 +491,9 @@ export default function PaymentStepTwo({ booking, onBack }: Props) {
                     disabled={!formReady}
                     className={
                       formReady
-                        ? "flex-1 rounded-full bg-forest-900 px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-forest-800"
+                        ? canSubmit
+                          ? "flex-1 rounded-full bg-forest-900 px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-forest-800"
+                          : "flex-1 rounded-full bg-green-200 px-6 py-3 text-sm font-semibold text-white/90 transition hover:bg-green-300"
                         : "flex-1 cursor-not-allowed rounded-full bg-green-200 px-6 py-3 text-sm font-semibold text-white/90"
                     }
                   >
@@ -483,6 +504,38 @@ export default function PaymentStepTwo({ booking, onBack }: Props) {
             </>
           )}
         </div>
+
+        <div className="rounded-2xl border border-gold-100 bg-white p-6 shadow-sm sm:p-8">
+          <PaymentTermsAccordion
+            open={termsOpen}
+            onToggle={() => setTermsOpen((v) => !v)}
+          />
+
+          <label className="mt-4 flex items-start gap-2.5">
+            <input
+              type="checkbox"
+              checked={agreed}
+              onChange={(e) => setAgreed(e.target.checked)}
+              className="mt-0.5 h-4 w-4 shrink-0 rounded border-forest-900/30 text-gold-500 focus:ring-gold-400"
+            />
+            <span className="text-sm text-forest-950/70">
+              I have read and agree to the{" "}
+              <button
+                type="button"
+                onClick={() => setTermsModalOpen(true)}
+                className="font-semibold text-gold-600 underline-offset-2 hover:underline"
+              >
+                Terms and Conditions for Payments
+              </button>
+            </span>
+          </label>
+        </div>
+
+        <PaymentTermsModal
+          open={termsModalOpen}
+          onClose={() => setTermsModalOpen(false)}
+          onAccept={handleTermsAccept}
+        />
       </div>
 
       <PaymentSummarySidebar

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState, type FormEvent, type ReactNode } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, Link } from "react-router-dom";
 import {
   MapPin,
   Calendar,
@@ -10,7 +10,6 @@ import {
   Info,
 } from "lucide-react";
 import planCollage from "../assets/plan-collage.jpg";
-import { TermsModal } from "../components/PaymentTerms";
 import { COUNTRIES } from "../data/countries";
 import { getPlanPrefillFromPackage } from "../lib/tourPackagePrefill";
 
@@ -530,7 +529,6 @@ export default function Plan() {
   const [budget, setBudget] = useState("");
   const [dreamTrip, setDreamTrip] = useState("");
   const [agreed, setAgreed] = useState(false);
-  const [termsModalOpen, setTermsModalOpen] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
@@ -840,12 +838,12 @@ export default function Plan() {
                 <Info size={18} className="mt-0.5 shrink-0 text-blue-600" />
                 <div>
                   <p className="text-sm font-semibold text-blue-900">
-                    Entry tickets &amp; transport extras not included
+                    Entry tickets &amp; activities not included
                   </p>
                   <p className="mt-1 text-sm leading-relaxed text-blue-800/85">
-                    Entry tickets for attractions, train journeys, and similar
-                    activities are not included in your tour quote. These costs
-                    are paid directly by you during your trip.
+                    Entry tickets for places and fun activities are not included
+                    in your tour quote. You will need to pay for these yourself
+                    during your trip.
                   </p>
                 </div>
               </div>
@@ -1407,34 +1405,31 @@ export default function Plan() {
                       />
                     </label>
 
-                    <div className="flex items-start gap-2.5">
+                    <label className="flex items-start gap-2.5">
                       <input
-                        id="plan-terms-agreement"
                         type="checkbox"
                         checked={agreed}
                         onChange={(e) => setAgreed(e.target.checked)}
                         className="mt-0.5 h-4 w-4 shrink-0 rounded border-forest-900/30 text-gold-500 focus:ring-gold-400"
                       />
-                      <p className="text-sm text-forest-950/70">
+                      <span className="text-sm text-forest-950/70">
                         I agree to the{" "}
-                        <button
-                          type="button"
-                          onClick={() => setTermsModalOpen(true)}
+                        <Link
+                          to="/payments"
                           className="font-medium text-gold-600 hover:underline"
                         >
                           Terms &amp; Conditions
-                        </button>{" "}
+                        </Link>{" "}
                         and{" "}
-                        <a
-                          href="#"
-                          onClick={(e) => e.preventDefault()}
+                        <Link
+                          to="/privacy"
                           className="font-medium text-gold-600 hover:underline"
                         >
                           Privacy Policy
-                        </a>
+                        </Link>
                         . I consent to being contacted about my trip request.
-                      </p>
-                    </div>
+                      </span>
+                    </label>
 
                     {submitError && (
                       <p className="rounded-lg bg-red-50 px-4 py-2.5 text-sm text-red-600">
@@ -1530,13 +1525,6 @@ export default function Plan() {
                 </div>
               </div>
             </form>
-          )}
-
-          {!submitted && (
-            <TermsModal
-              open={termsModalOpen}
-              onClose={() => setTermsModalOpen(false)}
-            />
           )}
         </div>
       </section>

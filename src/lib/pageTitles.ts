@@ -7,6 +7,7 @@ export const PAGE_TITLES: Record<string, string> = {
   "/payment-declined": "Payment Declined",
   "/contact": "Contact Us",
   "/plan": "Plan My Trip",
+  "/privacy": "Privacy Statement",
 };
 
 export function pageTitleForPath(pathname: string): string {
