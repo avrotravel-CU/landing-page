@@ -33,6 +33,29 @@ function parseDateOnly(value: string): Date | null {
   return date;
 }
 
+function formatDateInput(date: Date): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function earliestArrivalDate(from = new Date()): string {
+  const date = new Date(from.getFullYear(), from.getMonth(), from.getDate());
+  date.setDate(date.getDate() + 7);
+  return formatDateInput(date);
+}
+
+function formatDisplayDate(value: string): string {
+  const date = parseDateOnly(value);
+  if (!date) return value;
+  return new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  }).format(date);
+}
+
 function calculateTripDays(arrival: string, departure: string): number {
   const start = parseDateOnly(arrival);
   const end = parseDateOnly(departure);
@@ -279,8 +302,11 @@ function DateInput({
         {...props}
         ref={inputRef}
         type="date"
+        autoComplete="off"
         onChange={handleChange}
-        className="w-full rounded-lg border border-forest-900/15 px-4 py-2.5 pr-10 text-sm text-forest-950 outline-none transition [color-scheme:light] focus:border-gold-400"
+        className={`w-full rounded-lg border border-forest-900/15 px-4 py-2.5 pr-10 text-sm text-forest-950 outline-none transition [color-scheme:light] focus:border-gold-400 ${
+          props.value ? "" : "text-forest-950/35"
+        }`}
       />
       <button
         type="button"
@@ -516,6 +542,13 @@ export default function Plan() {
 
   const canSubmit = missingRequired.length === 0;
 
+  const minArrivalDate = useMemo(() => earliestArrivalDate(), []);
+
+  const minDepartureDate = useMemo(() => {
+    if (arrival && arrival >= minArrivalDate) return arrival;
+    return minArrivalDate;
+  }, [arrival, minArrivalDate]);
+
   const tripDayCount = useMemo(() => {
     if (!arrival || !departure) return null;
     return calculateTripDays(arrival, departure);
@@ -529,6 +562,26 @@ export default function Plan() {
       setDays("");
     }
   }, [tripDayCount]);
+
+  useEffect(() => {
+    if (arrival && arrival < minArrivalDate) setArrival("");
+  }, [arrival, minArrivalDate]);
+
+  useEffect(() => {
+    if (departure && departure < minDepartureDate) setDeparture("");
+  }, [departure, minDepartureDate]);
+
+  function handleArrivalChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const value = e.target.value;
+    if (value && value < minArrivalDate) return;
+    setArrival(value);
+  }
+
+  function handleDepartureChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const value = e.target.value;
+    if (value && value < minDepartureDate) return;
+    setDeparture(value);
+  }
 
   function orNone(value: string): string {
     return value.trim() ? value : "None specified";
@@ -816,14 +869,22 @@ export default function Plan() {
                         <Label required>Planned Arrival Date</Label>
                         <DateInput
                           value={arrival}
-                          onChange={(e) => setArrival(e.target.value)}
+                          min={minArrivalDate}
+                          autoComplete="off"
+                          onChange={handleArrivalChange}
                         />
+                        <p className="mt-1 text-xs text-forest-950/50">
+                          Earliest arrival: {formatDisplayDate(minArrivalDate)} (at
+                          least 7 days from today)
+                        </p>
                       </label>
                       <label className="block">
                         <Label required>Planned Departure Date</Label>
                         <DateInput
                           value={departure}
-                          onChange={(e) => setDeparture(e.target.value)}
+                          min={minDepartureDate}
+                          autoComplete="off"
+                          onChange={handleDepartureChange}
                         />
                       </label>
                     </div>
