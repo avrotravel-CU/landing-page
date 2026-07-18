@@ -1,6 +1,7 @@
 import { Routes, Route } from "react-router-dom";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
+import useGoogleAnalytics from "./hooks/useGoogleAnalytics";
 import usePageTitle from "./hooks/usePageTitle";
 import Home from "./pages/Home";
 import TourPackages from "./pages/TourPackages";
@@ -13,6 +14,7 @@ import Plan from "./pages/Plan";
 
 export default function App() {
   usePageTitle();
+  useGoogleAnalytics();
 
   return (
     <div className="min-h-screen bg-white">
