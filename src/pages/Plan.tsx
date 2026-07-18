@@ -10,6 +10,7 @@ import {
   Info,
 } from "lucide-react";
 import planCollage from "../assets/plan-collage.jpg";
+import { TermsModal } from "../components/PaymentTerms";
 import { COUNTRIES } from "../data/countries";
 import { getPlanPrefillFromPackage } from "../lib/tourPackagePrefill";
 
@@ -529,6 +530,7 @@ export default function Plan() {
   const [budget, setBudget] = useState("");
   const [dreamTrip, setDreamTrip] = useState("");
   const [agreed, setAgreed] = useState(false);
+  const [termsModalOpen, setTermsModalOpen] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
@@ -1414,13 +1416,13 @@ export default function Plan() {
                       />
                       <span className="text-sm text-forest-950/70">
                         I agree to the{" "}
-                        <a
-                          href="#"
-                          onClick={(e) => e.preventDefault()}
+                        <button
+                          type="button"
+                          onClick={() => setTermsModalOpen(true)}
                           className="font-medium text-gold-600 hover:underline"
                         >
                           Terms &amp; Conditions
-                        </a>{" "}
+                        </button>{" "}
                         and{" "}
                         <a
                           href="#"
@@ -1432,6 +1434,11 @@ export default function Plan() {
                         . I consent to being contacted about my trip request.
                       </span>
                     </label>
+
+                    <TermsModal
+                      open={termsModalOpen}
+                      onClose={() => setTermsModalOpen(false)}
+                    />
 
                     {submitError && (
                       <p className="rounded-lg bg-red-50 px-4 py-2.5 text-sm text-red-600">
