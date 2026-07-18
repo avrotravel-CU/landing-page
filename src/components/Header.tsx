@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Menu, X } from "lucide-react";
-import logo from "../assets/logo.png";
+import logo from "../assets/shell-icon.png";
 import { pageTitleForPath } from "../lib/pageTitles";
 
 const NAV_LINKS = [
@@ -22,14 +22,13 @@ export default function Header() {
   return (
     <header className="sticky top-0 z-50 w-full bg-white/95 backdrop-blur-sm border-b border-forest-100">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 lg:px-10">
-        <Link to="/" className="flex items-center gap-3">
+        <Link to="/" className="flex min-w-0 items-center gap-3">
           <img
             src={logo}
             alt="Ceylon Unscripted"
-            className="h-36 w-auto shrink-0"
+            className="h-14 w-14 shrink-0 object-contain sm:h-16 sm:w-16"
           />
-          <span className="mx-1 hidden h-10 w-px bg-forest-900/15 sm:block" />
-          <span className="hidden text-[13px] font-medium text-gold-500 sm:block">
+          <span className="min-w-0 truncate text-sm font-semibold text-forest-900 sm:text-[15px]">
             Ceylon Unscripted - {pageName}
           </span>
         </Link>
