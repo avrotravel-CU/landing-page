@@ -10,7 +10,17 @@ import {
   Info,
 } from "lucide-react";
 import planCollage from "../assets/plan-collage.jpg";
+import LegalDocumentModal from "../components/LegalDocumentModal";
 import { COUNTRIES } from "../data/countries";
+import {
+  PAYMENT_TERMS_SECTIONS,
+  PAYMENT_TERMS_TITLE,
+} from "../data/paymentTerms";
+import {
+  PRIVACY_INTRO,
+  PRIVACY_SECTIONS,
+  PRIVACY_STATEMENT_TITLE,
+} from "../data/privacyStatement";
 import { getPlanPrefillFromPackage } from "../lib/tourPackagePrefill";
 
 function parseDateOnly(value: string): Date | null {
@@ -529,6 +539,9 @@ export default function Plan() {
   const [budget, setBudget] = useState("");
   const [dreamTrip, setDreamTrip] = useState("");
   const [agreed, setAgreed] = useState(false);
+  const [legalModal, setLegalModal] = useState<"terms" | "privacy" | null>(
+    null
+  );
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
@@ -1415,21 +1428,21 @@ export default function Plan() {
                       />
                       <span className="text-sm text-forest-950/70">
                         I agree to the{" "}
-                        <a
-                          href="#"
-                          onClick={(e) => e.preventDefault()}
+                        <button
+                          type="button"
+                          onClick={() => setLegalModal("terms")}
                           className="font-medium text-gold-600 hover:underline"
                         >
                           Terms &amp; Conditions
-                        </a>{" "}
+                        </button>{" "}
                         and{" "}
-                        <a
-                          href="#"
-                          onClick={(e) => e.preventDefault()}
+                        <button
+                          type="button"
+                          onClick={() => setLegalModal("privacy")}
                           className="font-medium text-gold-600 hover:underline"
                         >
                           Privacy Policy
-                        </a>
+                        </button>
                         . I consent to being contacted about my trip request.
                       </span>
                     </label>
@@ -1529,6 +1542,21 @@ export default function Plan() {
               </div>
             </form>
           )}
+
+          <LegalDocumentModal
+            open={legalModal === "terms"}
+            onClose={() => setLegalModal(null)}
+            title={PAYMENT_TERMS_TITLE}
+            subtitle="Please review these terms before submitting your trip request."
+            sections={PAYMENT_TERMS_SECTIONS}
+          />
+          <LegalDocumentModal
+            open={legalModal === "privacy"}
+            onClose={() => setLegalModal(null)}
+            title={PRIVACY_STATEMENT_TITLE}
+            intro={PRIVACY_INTRO}
+            sections={PRIVACY_SECTIONS}
+          />
         </div>
       </section>
     </main>
