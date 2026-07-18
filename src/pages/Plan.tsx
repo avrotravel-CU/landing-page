@@ -252,7 +252,7 @@ function TextInput(
 function DateInput({
   onChange,
   value,
-  placeholder = "Select date",
+  placeholder = "YYYY-MM-DD",
   ...props
 }: React.InputHTMLAttributes<HTMLInputElement> & { placeholder?: string }) {
   const inputRef = useRef<HTMLInputElement>(null);
@@ -862,7 +862,7 @@ export default function Plan() {
                         <DateInput
                           value={arrival}
                           min={minArrivalDate}
-                          placeholder="Select arrival date"
+                          placeholder="YYYY-MM-DD"
                           onChange={handleArrivalChange}
                         />
                         <p className="mt-1 text-xs text-forest-950/50">
@@ -875,7 +875,7 @@ export default function Plan() {
                         <DateInput
                           value={departure}
                           min={minDepartureDate}
-                          placeholder="Select departure date"
+                          placeholder="YYYY-MM-DD"
                           onChange={handleDepartureChange}
                         />
                       </label>
