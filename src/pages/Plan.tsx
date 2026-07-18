@@ -882,16 +882,21 @@ export default function Plan() {
                     </div>
                     <label className="block">
                       <Label required>Number of Days in Sri Lanka</Label>
-                      <input
-                        readOnly
-                        value={
-                          tripDays
-                            ? `${tripDays} ${tripDayCount === 1 ? "day" : "days"}`
-                            : ""
-                        }
-                        placeholder="Calculated from your arrival and departure dates"
-                        className="w-full rounded-lg border border-forest-900/15 bg-cream-50 px-4 py-2.5 text-sm text-forest-950 placeholder:text-forest-950/35 outline-none"
-                      />
+                      <div
+                        aria-live="polite"
+                        className="w-full rounded-lg border border-forest-900/15 bg-cream-50 px-4 py-2.5 text-sm text-forest-950"
+                      >
+                        {tripDays ? (
+                          <span>
+                            <span className="font-semibold tabular-nums">{tripDays}</span>{" "}
+                            {tripDayCount === 1 ? "day" : "days"} in Sri Lanka
+                          </span>
+                        ) : (
+                          <span className="text-forest-950/35">
+                            Select arrival and departure dates to calculate your trip length
+                          </span>
+                        )}
+                      </div>
                       {tripDayCount !== null && tripDayCount <= 0 && (
                         <p className="mt-1 text-xs text-red-600">
                           Departure must be on or after arrival.
