@@ -1407,14 +1407,15 @@ export default function Plan() {
                       />
                     </label>
 
-                    <label className="flex items-start gap-2.5">
+                    <div className="flex items-start gap-2.5">
                       <input
+                        id="plan-terms-agreement"
                         type="checkbox"
                         checked={agreed}
                         onChange={(e) => setAgreed(e.target.checked)}
                         className="mt-0.5 h-4 w-4 shrink-0 rounded border-forest-900/30 text-gold-500 focus:ring-gold-400"
                       />
-                      <span className="text-sm text-forest-950/70">
+                      <p className="text-sm text-forest-950/70">
                         I agree to the{" "}
                         <button
                           type="button"
@@ -1432,13 +1433,8 @@ export default function Plan() {
                           Privacy Policy
                         </a>
                         . I consent to being contacted about my trip request.
-                      </span>
-                    </label>
-
-                    <TermsModal
-                      open={termsModalOpen}
-                      onClose={() => setTermsModalOpen(false)}
-                    />
+                      </p>
+                    </div>
 
                     {submitError && (
                       <p className="rounded-lg bg-red-50 px-4 py-2.5 text-sm text-red-600">
@@ -1534,6 +1530,13 @@ export default function Plan() {
                 </div>
               </div>
             </form>
+          )}
+
+          {!submitted && (
+            <TermsModal
+              open={termsModalOpen}
+              onClose={() => setTermsModalOpen(false)}
+            />
           )}
         </div>
       </section>

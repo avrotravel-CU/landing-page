@@ -1,3 +1,4 @@
+import { createPortal } from "react-dom";
 import {
   PAYMENT_TERMS_SECTIONS,
   PAYMENT_TERMS_TITLE,
@@ -71,10 +72,10 @@ export function TermsModal({
   onClose: () => void;
   subtitle?: string;
 }) {
-  if (!open) return null;
+  if (!open || typeof document === "undefined") return null;
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+  return createPortal(
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
       <button
         type="button"
         aria-label="Close terms dialog"
@@ -111,6 +112,7 @@ export function TermsModal({
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
