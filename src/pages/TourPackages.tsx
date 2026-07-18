@@ -68,7 +68,7 @@ export default function TourPackages() {
                       {pkg.price}
                     </span>
                     <Link
-                      to="/plan"
+                      to={`/plan?package=${pkg.slug}`}
                       className="inline-flex items-center gap-1.5 rounded-full bg-gold-500 px-4 py-2 text-xs font-semibold text-white transition hover:bg-gold-600"
                     >
                       Book This <ArrowRight size={13} />

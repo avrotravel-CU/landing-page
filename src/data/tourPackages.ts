@@ -6,6 +6,7 @@ import honeymoonImg from "../assets/tour-packages/honeymoon.jpg";
 import familyAdventureImg from "../assets/tour-packages/family_adventure.jpg";
 
 export type TourPackage = {
+  slug: string;
   name: string;
   badge: string;
   image: string;
@@ -19,6 +20,7 @@ export type TourPackage = {
 
 export const tourPackages: TourPackage[] = [
   {
+    slug: "ceylon-classic",
     name: "Ceylon Classic",
     badge: "Most Popular",
     image: ceylonClassicImg,
@@ -36,6 +38,7 @@ export const tourPackages: TourPackage[] = [
     price: "From USD 850",
   },
   {
+    slug: "wildlife-wilderness",
     name: "Wildlife & Wilderness",
     badge: "Nature",
     image: wildlifeImg,
@@ -53,6 +56,7 @@ export const tourPackages: TourPackage[] = [
     price: "From USD 1,100",
   },
   {
+    slug: "beach-bliss",
     name: "Beach & Bliss",
     badge: "Relaxation",
     image: beachBlissImg,
@@ -70,6 +74,7 @@ export const tourPackages: TourPackage[] = [
     price: "From USD 700",
   },
   {
+    slug: "cultural-immersion",
     name: "Cultural Immersion",
     badge: "Deep Dive",
     image: culturalImmersionImg,
@@ -87,6 +92,7 @@ export const tourPackages: TourPackage[] = [
     price: "From USD 1,300",
   },
   {
+    slug: "honeymoon-in-ceylon",
     name: "Honeymoon in Ceylon",
     badge: "Romance",
     image: honeymoonImg,
@@ -104,6 +110,7 @@ export const tourPackages: TourPackage[] = [
     price: "From USD 1,500",
   },
   {
+    slug: "family-adventure",
     name: "Family Adventure",
     badge: "Family",
     image: familyAdventureImg,

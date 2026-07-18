@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState, type FormEvent, type ReactNode } from "react";
+import { useSearchParams } from "react-router-dom";
 import {
   MapPin,
   Calendar,
@@ -9,6 +10,7 @@ import {
 } from "lucide-react";
 import planCollage from "../assets/plan-collage.jpg";
 import { COUNTRIES } from "../data/countries";
+import { getPlanPrefillFromPackage } from "../lib/tourPackagePrefill";
 
 function parseDateOnly(value: string): Date | null {
   const [year, month, day] = value.split("-").map(Number);
@@ -53,6 +55,13 @@ function calculateTripDays(arrival: string, departure: string): number {
   if (!start || !end) return 0;
   const diffMs = end.getTime() - start.getTime();
   return Math.floor(diffMs / (1000 * 60 * 60 * 24)) + 1;
+}
+
+function addDaysToDateString(value: string, daysToAdd: number): string {
+  const date = parseDateOnly(value);
+  if (!date) return "";
+  date.setDate(date.getDate() + daysToAdd);
+  return formatDateInput(date);
 }
 
 const ADULTS_OPTIONS = ["1", "2", "3", "4", "5", "6+"];
@@ -469,6 +478,7 @@ function Pill({
 }
 
 export default function Plan() {
+  const [searchParams] = useSearchParams();
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
@@ -521,6 +531,8 @@ export default function Plan() {
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
+  const [selectedPackageName, setSelectedPackageName] = useState("");
+  const [packageDayCount, setPackageDayCount] = useState<number | null>(null);
 
   const minArrivalDate = useMemo(() => earliestArrivalDate(), []);
 
@@ -556,6 +568,26 @@ export default function Plan() {
   const canSubmit = missingRequired.length === 0;
 
   useEffect(() => {
+    const slug = searchParams.get("package");
+    if (!slug) return;
+
+    const prefill = getPlanPrefillFromPackage(slug);
+    if (!prefill) return;
+
+    setSelectedPackageName(prefill.packageName);
+    setPackageDayCount(prefill.dayCount);
+    setAdults(prefill.adults);
+    setDestinations(prefill.destinations);
+    setOtherDestinations(prefill.otherDestinations);
+    setActivities(prefill.activities);
+    setBudget(prefill.budget);
+    setDreamTrip(prefill.dreamTrip);
+    if (prefill.childFriendly) setChildFriendly(prefill.childFriendly);
+    if (prefill.hotelRating) setHotelRating(prefill.hotelRating);
+    if (prefill.roomTypes?.length) setRoomTypes(prefill.roomTypes);
+  }, [searchParams]);
+
+  useEffect(() => {
     if (arrival && arrival < minArrivalDate) setArrival("");
   }, [arrival, minArrivalDate]);
 
@@ -567,6 +599,12 @@ export default function Plan() {
     const value = e.target.value;
     if (value && value < minArrivalDate) return;
     setArrival(value);
+    if (value && packageDayCount && packageDayCount > 0) {
+      const suggestedDeparture = addDaysToDateString(value, packageDayCount - 1);
+      if (suggestedDeparture && suggestedDeparture >= value) {
+        setDeparture(suggestedDeparture);
+      }
+    }
   }
 
   function handleDepartureChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -595,6 +633,9 @@ export default function Plan() {
       "",
       "2. TRIP DETAILS",
       "-".repeat(40),
+      ...(selectedPackageName
+        ? [line("Selected Tour Package", selectedPackageName)]
+        : []),
       line("Arrival Date", arrival),
       line("Departure Date", departure),
       line("Number of Days", tripDays),
@@ -670,6 +711,9 @@ export default function Plan() {
       "Phone / WhatsApp": orNone(phone),
       "Country of Residence": country,
       "Preferred Contact Method": contactMethod,
+      ...(selectedPackageName
+        ? { "Selected Tour Package": selectedPackageName }
+        : {}),
       "Arrival Date": arrival,
       "Departure Date": departure,
       "Number of Days": tripDays,
@@ -789,6 +833,22 @@ export default function Plan() {
             </div>
           ) : (
             <form onSubmit={handleSubmit} autoComplete="off">
+              {selectedPackageName && (
+                <div className="mb-8 rounded-xl border border-gold-200 bg-gold-50 px-5 py-4">
+                  <p className="text-sm font-semibold text-forest-900">
+                    Prefilled from {selectedPackageName}
+                  </p>
+                  <p className="mt-1 text-sm text-forest-950/65">
+                    We&apos;ve filled in group size, destinations, budget, and activities
+                    from this package. Choose your arrival date and we&apos;ll set your
+                    departure automatically
+                    {packageDayCount
+                      ? ` for ${packageDayCount} days in Sri Lanka`
+                      : ""}
+                    . Edit anything below before submitting.
+                  </p>
+                </div>
+              )}
               <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 lg:gap-8">
                 <div className="space-y-6">
                   <SectionCard num={1} title="Contact Information">
