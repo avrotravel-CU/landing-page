@@ -269,31 +269,42 @@ function TextInput(
 
 function DateInput({
   onChange,
+  value,
+  placeholder = "Select date",
   ...props
-}: React.InputHTMLAttributes<HTMLInputElement>) {
+}: React.InputHTMLAttributes<HTMLInputElement> & { placeholder?: string }) {
   const inputRef = useRef<HTMLInputElement>(null);
 
   function openPicker() {
     const el = inputRef.current;
     if (!el) return;
+    el.focus();
     if ("showPicker" in el) {
       try {
         (el as HTMLInputElement & { showPicker: () => void }).showPicker();
-        return;
       } catch {
-        // Some browsers throw if not called from a direct user gesture on
-        // the input itself; fall back to focusing the field.
+        // Some browsers throw if not called from a direct user gesture.
       }
     }
-    el.focus();
+  }
+
+  function closePicker(el: HTMLInputElement) {
+    el.blur();
+  }
+
+  function closeIfComplete(el: HTMLInputElement) {
+    if (!el.value || !el.validity.valid) return;
+    closePicker(el);
+    queueMicrotask(() => closePicker(el));
   }
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     onChange?.(e);
-    if (e.currentTarget.value) {
-      // Defer blur so Chrome closes the native date picker after selection.
-      window.setTimeout(() => e.currentTarget.blur(), 0);
-    }
+    closeIfComplete(e.currentTarget);
+  }
+
+  function handleInput(e: React.FormEvent<HTMLInputElement>) {
+    closeIfComplete(e.currentTarget);
   }
 
   return (
@@ -302,10 +313,14 @@ function DateInput({
         {...props}
         ref={inputRef}
         type="date"
+        value={value ?? ""}
+        required
         autoComplete="off"
+        data-placeholder={placeholder}
+        onInput={handleInput}
         onChange={handleChange}
-        className={`w-full rounded-lg border border-forest-900/15 px-4 py-2.5 pr-10 text-sm text-forest-950 outline-none transition [color-scheme:light] focus:border-gold-400 ${
-          props.value ? "" : "text-forest-950/35"
+        className={`date-input w-full rounded-lg border border-forest-900/15 px-4 py-2.5 pr-10 text-sm text-forest-950 outline-none transition [color-scheme:light] focus:border-gold-400 ${
+          value ? "" : "text-forest-950/35"
         }`}
       />
       <button
@@ -796,7 +811,7 @@ export default function Plan() {
               </div>
             </div>
           ) : (
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmit} autoComplete="off">
               <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 lg:gap-8">
                 <div className="space-y-6">
                   <SectionCard num={1} title="Contact Information">
@@ -870,7 +885,7 @@ export default function Plan() {
                         <DateInput
                           value={arrival}
                           min={minArrivalDate}
-                          autoComplete="off"
+                          placeholder="Select arrival date"
                           onChange={handleArrivalChange}
                         />
                         <p className="mt-1 text-xs text-forest-950/50">
@@ -883,7 +898,7 @@ export default function Plan() {
                         <DateInput
                           value={departure}
                           min={minDepartureDate}
-                          autoComplete="off"
+                          placeholder="Select departure date"
                           onChange={handleDepartureChange}
                         />
                       </label>

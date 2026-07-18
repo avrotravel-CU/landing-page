@@ -47,3 +47,17 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   height: 100%;
   cursor: pointer;
 }
+
+/* Keep empty date fields blank instead of showing today's date. */
+input[type="date"].date-input:required:invalid::-webkit-datetime-edit {
+  opacity: 0;
+}
+
+input[type="date"].date-input:required:invalid::-webkit-datetime-edit-fields-wrapper {
+  opacity: 0;
+}
+
+input[type="date"].date-input:required:invalid::before {
+  content: attr(data-placeholder);
+  color: rgb(28 46 28 / 0.35);
+}
