@@ -10,15 +10,6 @@ import {
 import planCollage from "../assets/plan-collage.jpg";
 import { COUNTRIES } from "../data/countries";
 
-const DAYS_OPTIONS = [
-  "1-3 Days",
-  "4-6 Days",
-  "7-9 Days",
-  "10-14 Days",
-  "15-21 Days",
-  "22+ Days",
-];
-
 function parseDateOnly(value: string): Date | null {
   const [year, month, day] = value.split("-").map(Number);
   if (!year || !month || !day) return null;
@@ -62,15 +53,6 @@ function calculateTripDays(arrival: string, departure: string): number {
   if (!start || !end) return 0;
   const diffMs = end.getTime() - start.getTime();
   return Math.floor(diffMs / (1000 * 60 * 60 * 24)) + 1;
-}
-
-function daysOptionForCount(count: number): string {
-  if (count <= 3) return "1-3 Days";
-  if (count <= 6) return "4-6 Days";
-  if (count <= 9) return "7-9 Days";
-  if (count <= 14) return "10-14 Days";
-  if (count <= 21) return "15-21 Days";
-  return "22+ Days";
 }
 
 const ADULTS_OPTIONS = ["1", "2", "3", "4", "5", "6+"];
@@ -498,7 +480,6 @@ export default function Plan() {
 
   const [arrival, setArrival] = useState("");
   const [departure, setDeparture] = useState("");
-  const [days, setDays] = useState("");
   const [adults, setAdults] = useState("");
   const [infants, setInfants] = useState(0);
   const [children, setChildren] = useState(0);
@@ -541,22 +522,6 @@ export default function Plan() {
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
 
-  const missingRequired = (() => {
-    const missing: string[] = [];
-    if (!firstName.trim()) missing.push("First name");
-    if (!lastName.trim()) missing.push("Last name");
-    if (!email.trim()) missing.push("Email address");
-    if (!country) missing.push("Country of residence");
-    if (!arrival) missing.push("Planned arrival date");
-    if (!departure) missing.push("Planned departure date");
-    if (!days) missing.push("Number of days");
-    if (!adults) missing.push("Number of adults");
-    if (!agreed) missing.push("Terms & Privacy agreement");
-    return missing;
-  })();
-
-  const canSubmit = missingRequired.length === 0;
-
   const minArrivalDate = useMemo(() => earliestArrivalDate(), []);
 
   const minDepartureDate = useMemo(() => {
@@ -569,14 +534,26 @@ export default function Plan() {
     return calculateTripDays(arrival, departure);
   }, [arrival, departure]);
 
-  useEffect(() => {
-    if (tripDayCount === null) return;
-    if (tripDayCount > 0) {
-      setDays(daysOptionForCount(tripDayCount));
-    } else {
-      setDays("");
+  const tripDays =
+    tripDayCount !== null && tripDayCount > 0 ? String(tripDayCount) : "";
+
+  const missingRequired = (() => {
+    const missing: string[] = [];
+    if (!firstName.trim()) missing.push("First name");
+    if (!lastName.trim()) missing.push("Last name");
+    if (!email.trim()) missing.push("Email address");
+    if (!country) missing.push("Country of residence");
+    if (!arrival) missing.push("Planned arrival date");
+    if (!departure) missing.push("Planned departure date");
+    if (tripDayCount === null || tripDayCount <= 0) {
+      missing.push("Number of days");
     }
-  }, [tripDayCount]);
+    if (!adults) missing.push("Number of adults");
+    if (!agreed) missing.push("Terms & Privacy agreement");
+    return missing;
+  })();
+
+  const canSubmit = missingRequired.length === 0;
 
   useEffect(() => {
     if (arrival && arrival < minArrivalDate) setArrival("");
@@ -620,7 +597,7 @@ export default function Plan() {
       "-".repeat(40),
       line("Arrival Date", arrival),
       line("Departure Date", departure),
-      line("Number of Days", days),
+      line("Number of Days", tripDays),
       line("Adults", adults),
       line("Infants (0-2)", String(infants)),
       line("Children (3-12)", String(children)),
@@ -695,7 +672,7 @@ export default function Plan() {
       "Preferred Contact Method": contactMethod,
       "Arrival Date": arrival,
       "Departure Date": departure,
-      "Number of Days": days,
+      "Number of Days": tripDays,
       Adults: adults,
       Infants: String(infants),
       Children: String(children),
@@ -905,21 +882,19 @@ export default function Plan() {
                     </div>
                     <label className="block">
                       <Label required>Number of Days in Sri Lanka</Label>
-                      <Select
-                        options={DAYS_OPTIONS}
-                        placeholder="Select..."
-                        value={days}
-                        onChange={(e) => setDays(e.target.value)}
+                      <input
+                        readOnly
+                        value={
+                          tripDays
+                            ? `${tripDays} ${tripDayCount === 1 ? "day" : "days"}`
+                            : ""
+                        }
+                        placeholder="Calculated from your arrival and departure dates"
+                        className="w-full rounded-lg border border-forest-900/15 bg-cream-50 px-4 py-2.5 text-sm text-forest-950 placeholder:text-forest-950/35 outline-none"
                       />
                       {tripDayCount !== null && tripDayCount <= 0 && (
                         <p className="mt-1 text-xs text-red-600">
                           Departure must be on or after arrival.
-                        </p>
-                      )}
-                      {tripDayCount !== null && tripDayCount > 0 && (
-                        <p className="mt-1 text-xs text-forest-950/50">
-                          {tripDayCount} {tripDayCount === 1 ? "day" : "days"} in
-                          Sri Lanka (auto-calculated from your dates)
                         </p>
                       )}
                     </label>
