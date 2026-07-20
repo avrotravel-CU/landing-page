@@ -1,4 +1,4 @@
-import logoPrimary from "../assets/ideadate/logo-primary.png";
+import logoWhiteYellow from "../assets/ideadate/logo-white-yellow.png";
 
 const IDEA_DATE_URL = "https://www.ideadate.app";
 
@@ -17,8 +17,8 @@ export default function IdeaDateCornerWidget() {
       >
         <div className="flex items-start gap-2.5">
           <img
-            src={logoPrimary}
-            alt=""
+            src={logoWhiteYellow}
+            alt="IdeaDate"
             className="ideadate-chat-logo mt-0.5 h-9 w-9 shrink-0 object-contain"
           />
           <div className="min-w-0 pt-0.5">
