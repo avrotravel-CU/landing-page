@@ -1,42 +1,11 @@
-import { useEffect, useState } from "react";
-import { X } from "lucide-react";
+import { useState } from "react";
 import logoPrimary from "../assets/ideadate/logo-primary.png";
 import typefaceDark from "../assets/ideadate/typeface-dark.png";
 
 const IDEA_DATE_URL = "https://www.ideadate.app";
-const DISMISS_KEY = "ideadate-badge-dismissed-until";
-const DISMISS_DAYS = 7;
-
-function isDismissed() {
-  try {
-    const until = localStorage.getItem(DISMISS_KEY);
-    if (!until) return false;
-    return Date.now() < Number(until);
-  } catch {
-    return false;
-  }
-}
-
-function dismissForWeek() {
-  try {
-    localStorage.setItem(
-      DISMISS_KEY,
-      String(Date.now() + DISMISS_DAYS * 24 * 60 * 60 * 1000)
-    );
-  } catch {
-    // ignore storage failures
-  }
-}
 
 export default function IdeaDateFloatingBadge() {
-  const [hidden, setHidden] = useState(true);
   const [open, setOpen] = useState(false);
-
-  useEffect(() => {
-    setHidden(isDismissed());
-  }, []);
-
-  if (hidden) return null;
 
   return (
     <div
@@ -53,25 +22,11 @@ export default function IdeaDateFloatingBadge() {
           aria-hidden={!open}
         >
           <div className="w-[min(18rem,calc(100vw-5.5rem))] rounded-2xl border border-gold-200 bg-white p-4 shadow-xl shadow-forest-900/10">
-            <div className="mb-3 flex items-start justify-between gap-2">
-              <img
-                src={typefaceDark}
-                alt="IdeaDate"
-                className="h-5 w-auto object-contain"
-              />
-              <button
-                type="button"
-                aria-label="Dismiss IdeaDate badge for one week"
-                className="rounded-full p-1 text-forest-900/45 transition hover:bg-forest-50 hover:text-forest-900"
-                onClick={() => {
-                  dismissForWeek();
-                  setHidden(true);
-                  setOpen(false);
-                }}
-              >
-                <X size={16} />
-              </button>
-            </div>
+            <img
+              src={typefaceDark}
+              alt="IdeaDate"
+              className="mb-3 h-5 w-auto object-contain"
+            />
 
             <p className="text-sm leading-relaxed text-forest-950/80">
               Got a business idea? Looking for a business to invest?
