@@ -62,56 +62,75 @@ input[type="date"].date-input:required:invalid::before {
   color: rgb(28 46 28 / 0.35);
 }
 
-@keyframes ideadate-float {
+@keyframes ideadate-banner-float {
   0%,
   100% {
     transform: translateY(0);
   }
   50% {
-    transform: translateY(-7px);
+    transform: translateY(-4px);
   }
 }
 
-@keyframes ideadate-pulse-ring {
+@keyframes ideadate-banner-shimmer {
   0% {
-    box-shadow: 0 0 0 0 rgb(200 146 42 / 0.45);
+    background-position: 200% center;
+  }
+  100% {
+    background-position: -200% center;
+  }
+}
+
+@keyframes ideadate-banner-glow {
+  0%,
+  100% {
+    box-shadow: 0 10px 24px rgb(200 146 42 / 0.25);
+  }
+  50% {
+    box-shadow: 0 12px 28px rgb(200 146 42 / 0.45);
+  }
+}
+
+@keyframes ideadate-banner-logo-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgb(212 165 69 / 0.35);
   }
   70% {
-    box-shadow: 0 0 0 12px rgb(200 146 42 / 0);
-  }
-  100% {
-    box-shadow: 0 0 0 0 rgb(200 146 42 / 0);
+    box-shadow: 0 0 0 10px rgb(212 165 69 / 0);
   }
 }
 
-@keyframes ideadate-dot-ping {
-  0% {
-    transform: scale(1);
-    opacity: 0.75;
-  }
-  75%,
-  100% {
-    transform: scale(2.2);
-    opacity: 0;
-  }
+.ideadate-banner-float {
+  animation: ideadate-banner-float 4s ease-in-out infinite;
 }
 
-.ideadate-badge-motion {
-  animation: ideadate-float 3.2s ease-in-out infinite;
+.ideadate-banner-shimmer {
+  background: linear-gradient(
+    110deg,
+    transparent 25%,
+    rgb(212 165 69 / 0.18) 45%,
+    rgb(255 255 255 / 0.08) 50%,
+    rgb(212 165 69 / 0.18) 55%,
+    transparent 75%
+  );
+  background-size: 200% 100%;
+  animation: ideadate-banner-shimmer 6s linear infinite;
 }
 
-.ideadate-badge-ring {
-  animation: ideadate-pulse-ring 2.4s ease-out infinite;
+.ideadate-banner-cta {
+  animation: ideadate-banner-glow 2.8s ease-in-out infinite;
 }
 
-.ideadate-badge-dot {
-  animation: ideadate-dot-ping 1.8s cubic-bezier(0, 0, 0.2, 1) infinite;
+.ideadate-banner-logo {
+  animation: ideadate-banner-logo-pulse 2.6s ease-out infinite;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .ideadate-badge-motion,
-  .ideadate-badge-ring,
-  .ideadate-badge-dot {
+  .ideadate-banner-float,
+  .ideadate-banner-shimmer,
+  .ideadate-banner-cta,
+  .ideadate-banner-logo {
     animation: none;
   }
 }
