@@ -15,9 +15,11 @@ Uses the **same** Vercel env vars as Plan My Trip:
 2. Replace `Code.gs` with the latest `scripts/google-apps-script.gs` from this repo → **Save**.
 3. **Run once** in the editor: select function `ensureReviewsSheet` is not exposed — first submit creates the tab. Or add a **Reviews** tab manually with headers:
 
-| A | B | C | D | E | F | G | H | I |
-|---|---|---|---|---|---|---|---|---|
-| Submitted At | Name | Country | Visit Month | Visit Year | Rating | Review | Photo URLs | Display on Site |
+| A | B | C | D | E | F | G | H | I | J |
+|---|---|---|---|---|---|---|---|---|---|
+| Submitted At | Name | Country | Town | Visit Month | Visit Year | Rating | Review | Photo URLs | Display on Site |
+
+Existing sheets without a **Town** column get one inserted automatically on the next review submission (after Country).
 
 4. **Deploy → Manage deployments → Edit** your existing Web app → **New version** → **Deploy** (same URL).
 5. The first review with photos will ask you to **authorize Google Drive** (stores images in folder **Ceylon Unscripted Review Photos**).
@@ -26,7 +28,7 @@ Uses the **same** Vercel env vars as Plan My Trip:
 
 ## Display on the website
 
-- Column **I — Display on Site**:
+- Column **J — Display on Site**:
   - **`Yes`** → shown on `/experiences`
   - **`No`** or **`Pending`** → hidden
 

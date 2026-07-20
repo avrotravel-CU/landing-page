@@ -15,6 +15,7 @@ export default async function handler(req, res) {
   try {
     const body = req.body && typeof req.body === "object" ? req.body : {};
     const name = String(body.name || "").trim();
+    const town = String(body.town || "").trim();
     const country = String(body.country || "").trim();
     const month = String(body.month || "").trim();
     const year = String(body.year || "").trim();
@@ -22,7 +23,7 @@ export default async function handler(req, res) {
     const review = String(body.review || "").trim();
     const photos = Array.isArray(body.photos) ? body.photos : [];
 
-    if (!name || !country || !month || !year || !review) {
+    if (!name || !town || !country || !month || !year || !review) {
       return res.status(400).json({ error: "Please fill in all required fields" });
     }
     if (!rating || rating < 1 || rating > 5) {
@@ -39,6 +40,7 @@ export default async function handler(req, res) {
         action: "submitReview",
         secret: sharedSecret,
         name,
+        town,
         country,
         month,
         year,

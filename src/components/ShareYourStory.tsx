@@ -33,6 +33,7 @@ type Props = {
 export default function ShareYourStory({ onSubmitted }: Props) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [name, setName] = useState("");
+  const [town, setTown] = useState("");
   const [country, setCountry] = useState("");
   const [month, setMonth] = useState("");
   const [year, setYear] = useState("");
@@ -49,6 +50,7 @@ export default function ShareYourStory({ onSubmitted }: Props) {
 
   const canSubmit =
     name.trim() !== "" &&
+    town.trim() !== "" &&
     country.trim() !== "" &&
     month !== "" &&
     year !== "" &&
@@ -85,6 +87,7 @@ export default function ShareYourStory({ onSubmitted }: Props) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: name.trim(),
+          town: town.trim(),
           country: country.trim(),
           month,
           year,
@@ -149,23 +152,39 @@ export default function ShareYourStory({ onSubmitted }: Props) {
               </label>
               <label className="block">
                 <span className="mb-1.5 block text-sm font-semibold text-forest-900">
-                  Country <span className="text-red-500">*</span>
+                  Town / City <span className="text-red-500">*</span>
                 </span>
-                <select
+                <input
                   required
-                  value={country}
-                  onChange={(e) => setCountry(e.target.value)}
-                  className="w-full rounded-lg border border-forest-900/15 bg-white px-4 py-2.5 text-sm text-forest-950 outline-none transition focus:border-gold-400"
-                >
-                  <option value="">Select country</option>
-                  {COUNTRIES.map((c) => (
-                    <option key={c} value={c}>
-                      {c}
-                    </option>
-                  ))}
-                </select>
+                  value={town}
+                  onChange={(e) => setTown(e.target.value)}
+                  placeholder="e.g. Toronto"
+                  className="w-full rounded-lg border border-forest-900/15 px-4 py-2.5 text-sm text-forest-950 placeholder:text-forest-950/35 outline-none transition focus:border-gold-400"
+                />
               </label>
             </div>
+
+            <label className="block">
+              <span className="mb-1.5 block text-sm font-semibold text-forest-900">
+                Country <span className="text-red-500">*</span>
+              </span>
+              <select
+                required
+                value={country}
+                onChange={(e) => setCountry(e.target.value)}
+                className="w-full rounded-lg border border-forest-900/15 bg-white px-4 py-2.5 text-sm text-forest-950 outline-none transition focus:border-gold-400"
+              >
+                <option value="">Select country</option>
+                {COUNTRIES.map((c) => (
+                  <option key={c} value={c}>
+                    {c}
+                  </option>
+                ))}
+              </select>
+              <p className="mt-1.5 text-xs text-forest-950/45">
+                Shown on your review as &ldquo;Town, Country&rdquo; (e.g. Melbourne, Australia).
+              </p>
+            </label>
 
             <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
               <label className="block">

@@ -165,7 +165,7 @@ function notifyNewReview(data) {
     "A new review was submitted on Ceylon Unscripted.",
     "",
     "  Name: " + name,
-    "  Country: " + String(data.country || ""),
+    "  Location: " + formatReviewLocation(data.town, data.country),
     "  Visit: " + String(data.month || "") + " " + String(data.year || ""),
     "  Rating: " + String(data.rating || "") + " / 5",
     "",
@@ -498,6 +498,67 @@ function appendTransactionRef(existing, newRef) {
 
 // --- Customer reviews (Share Your Story) ---
 
+function getReviewColumnIndexes(sheet) {
+  var lastCol = Math.max(sheet.getLastColumn(), 9);
+  var headers = sheet.getRange(1, 1, 1, lastCol).getValues()[0];
+
+  function idx(label) {
+    for (var i = 0; i < headers.length; i++) {
+      if (String(headers[i] || "").trim().toLowerCase() === label) return i;
+    }
+    return -1;
+  }
+
+  return {
+    submittedAt: idx("submitted at") >= 0 ? idx("submitted at") : 0,
+    name: idx("name") >= 0 ? idx("name") : 1,
+    country: idx("country") >= 0 ? idx("country") : 2,
+    town: idx("town"),
+    visitMonth: idx("visit month") >= 0 ? idx("visit month") : 3,
+    visitYear: idx("visit year") >= 0 ? idx("visit year") : 4,
+    rating: idx("rating") >= 0 ? idx("rating") : 5,
+    review: idx("review") >= 0 ? idx("review") : 6,
+    photoUrls: idx("photo urls") >= 0 ? idx("photo urls") : 7,
+    display: idx("display on site") >= 0 ? idx("display on site") : 8,
+  };
+}
+
+function formatReviewLocation(town, country) {
+  town = String(town || "").trim();
+  country = String(country || "").trim();
+  if (town && country) return town + ", " + country;
+  return town || country;
+}
+
+function ensureTownColumn(sheet) {
+  var cols = getReviewColumnIndexes(sheet);
+  if (cols.town >= 0) return cols;
+
+  var countryIdx = cols.country >= 0 ? cols.country : 2;
+  sheet.insertColumnAfter(countryIdx + 1);
+  sheet.getRange(1, countryIdx + 2).setValue("Town");
+  return getReviewColumnIndexes(sheet);
+}
+
+function appendReviewRow(sheet, cols, values) {
+  var width = sheet.getLastColumn();
+  var row = [];
+  for (var i = 0; i < width; i++) row.push("");
+
+  row[cols.submittedAt] = values.submittedAt;
+  row[cols.name] = values.name;
+  row[cols.country] = values.country;
+  if (cols.town >= 0) row[cols.town] = values.town;
+  row[cols.visitMonth] = values.visitMonth;
+  row[cols.visitYear] = values.visitYear;
+  row[cols.rating] = values.rating;
+  row[cols.review] = values.review;
+  row[cols.photoUrls] = values.photoUrls;
+  row[cols.display] = values.display;
+
+  sheet.appendRow(row);
+}
+
 function ensureReviewsSheet() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
   var sheet = ss.getSheetByName("Reviews");
@@ -507,6 +568,7 @@ function ensureReviewsSheet() {
       "Submitted At",
       "Name",
       "Country",
+      "Town",
       "Visit Month",
       "Visit Year",
       "Rating",
@@ -571,13 +633,14 @@ function saveReviewPhotos(photos) {
 function submitReview(data) {
   try {
     var name = String(data.name || "").trim();
+    var town = String(data.town || "").trim();
     var country = String(data.country || "").trim();
     var month = String(data.month || "").trim();
     var year = String(data.year || "").trim();
     var rating = Number(data.rating);
     var reviewText = String(data.review || "").trim();
 
-    if (!name || !country || !month || !year || !reviewText) {
+    if (!name || !town || !country || !month || !year || !reviewText) {
       return json({ ok: false, error: "Missing required review fields" });
     }
     if (!rating || rating < 1 || rating > 5) {
@@ -586,20 +649,22 @@ function submitReview(data) {
 
     var photoUrls = saveReviewPhotos(data.photos);
     var sheet = ensureReviewsSheet();
+    var cols = ensureTownColumn(sheet);
 
     var displayStatus = "Yes";
 
-    sheet.appendRow([
-      new Date(),
-      name,
-      country,
-      month,
-      year,
-      rating,
-      reviewText,
-      photoUrls.join(" | "),
-      displayStatus,
-    ]);
+    appendReviewRow(sheet, cols, {
+      submittedAt: new Date(),
+      name: name,
+      town: town,
+      country: country,
+      visitMonth: month,
+      visitYear: year,
+      rating: rating,
+      review: reviewText,
+      photoUrls: photoUrls.join(" | "),
+      display: displayStatus,
+    });
 
     var notification = notifyNewReview(data);
 
@@ -624,30 +689,37 @@ function listReviews() {
     return json({ ok: true, reviews: [] });
   }
 
-  var values = sheet.getRange(2, 1, sheet.getLastRow(), 9).getValues();
+  var cols = getReviewColumnIndexes(sheet);
+  var values = sheet.getRange(2, 1, sheet.getLastRow(), sheet.getLastColumn()).getValues();
   var reviews = [];
 
   for (var i = values.length - 1; i >= 0; i--) {
     var row = values[i];
-    var display = String(row[8] || "").trim();
+    var display = String(row[cols.display] || "").trim();
     if (display !== "Yes") continue;
 
-    var photoRaw = String(row[7] || "").trim();
+    var photoRaw = String(row[cols.photoUrls] || "").trim();
     var photos = photoRaw
       ? photoRaw.split(" | ").filter(function (u) {
           return u.trim();
         }).map(normalizeDrivePhotoUrl)
       : [];
 
+    var town = cols.town >= 0 ? String(row[cols.town] || "").trim() : "";
+    var country = String(row[cols.country] || "").trim();
+
     reviews.push({
       id: "review-" + (i + 2),
-      name: String(row[1] || ""),
-      location: String(row[2] || ""),
-      visited: String(row[3] || "") + " " + String(row[4] || ""),
-      quote: String(row[6] || ""),
-      rating: Number(row[5]) || 5,
+      name: String(row[cols.name] || ""),
+      location: formatReviewLocation(town, country),
+      visited:
+        String(row[cols.visitMonth] || "") + " " + String(row[cols.visitYear] || ""),
+      quote: String(row[cols.review] || ""),
+      rating: Number(row[cols.rating]) || 5,
       photos: photos,
-      submittedAt: row[0] ? new Date(row[0]).toISOString() : "",
+      submittedAt: row[cols.submittedAt]
+        ? new Date(row[cols.submittedAt]).toISOString()
+        : "",
     });
   }
 
@@ -723,6 +795,7 @@ function authorizeScript() {
 function testSubmitReviewInSheet() {
   var result = submitReview({
     name: "Apps Script Test",
+    town: "Colombo",
     country: "Sri Lanka",
     month: "July",
     year: "2026",
