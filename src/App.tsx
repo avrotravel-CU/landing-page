@@ -1,6 +1,6 @@
 import { Routes, Route } from "react-router-dom";
 import Header from "./components/Header";
-import IdeaDateBottomBanner from "./components/IdeaDateBottomBanner";
+import IdeaDateCornerWidget from "./components/IdeaDateCornerWidget";
 import Footer from "./components/Footer";
 import useGoogleAnalytics from "./hooks/useGoogleAnalytics";
 import usePageTitle from "./hooks/usePageTitle";
@@ -18,9 +18,9 @@ export default function App() {
   useGoogleAnalytics();
 
   return (
-    <div className="min-h-screen bg-white pb-28 sm:pb-24">
+    <div className="min-h-screen bg-white">
       <Header />
-      <IdeaDateBottomBanner />
+      <IdeaDateCornerWidget />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/tour-packages" element={<TourPackages />} />

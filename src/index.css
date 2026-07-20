@@ -62,75 +62,52 @@ input[type="date"].date-input:required:invalid::before {
   color: rgb(28 46 28 / 0.35);
 }
 
-@keyframes ideadate-banner-float {
+@keyframes ideadate-chat-float {
   0%,
   100% {
     transform: translateY(0);
   }
   50% {
-    transform: translateY(-4px);
+    transform: translateY(-3px);
   }
 }
 
-@keyframes ideadate-banner-shimmer {
-  0% {
-    background-position: 200% center;
-  }
-  100% {
-    background-position: -200% center;
-  }
-}
-
-@keyframes ideadate-banner-glow {
+@keyframes ideadate-chat-glow {
   0%,
   100% {
-    box-shadow: 0 10px 24px rgb(200 146 42 / 0.25);
+    box-shadow: 0 8px 20px rgb(45 74 45 / 0.08);
   }
   50% {
-    box-shadow: 0 12px 28px rgb(200 146 42 / 0.45);
+    box-shadow: 0 10px 24px rgb(200 146 42 / 0.16);
   }
 }
 
-@keyframes ideadate-banner-logo-pulse {
+@keyframes ideadate-chat-logo-pulse {
   0%,
   100% {
-    box-shadow: 0 0 0 0 rgb(212 165 69 / 0.35);
+    transform: scale(1);
   }
-  70% {
-    box-shadow: 0 0 0 10px rgb(212 165 69 / 0);
+  50% {
+    transform: scale(1.04);
   }
 }
 
-.ideadate-banner-float {
-  animation: ideadate-banner-float 4s ease-in-out infinite;
+.ideadate-chat-float {
+  animation: ideadate-chat-float 4.5s ease-in-out infinite;
 }
 
-.ideadate-banner-shimmer {
-  background: linear-gradient(
-    110deg,
-    transparent 25%,
-    rgb(212 165 69 / 0.18) 45%,
-    rgb(255 255 255 / 0.08) 50%,
-    rgb(212 165 69 / 0.18) 55%,
-    transparent 75%
-  );
-  background-size: 200% 100%;
-  animation: ideadate-banner-shimmer 6s linear infinite;
+.ideadate-chat-card {
+  animation: ideadate-chat-glow 3s ease-in-out infinite;
 }
 
-.ideadate-banner-cta {
-  animation: ideadate-banner-glow 2.8s ease-in-out infinite;
-}
-
-.ideadate-banner-logo {
-  animation: ideadate-banner-logo-pulse 2.6s ease-out infinite;
+.ideadate-chat-logo {
+  animation: ideadate-chat-logo-pulse 2.8s ease-in-out infinite;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .ideadate-banner-float,
-  .ideadate-banner-shimmer,
-  .ideadate-banner-cta,
-  .ideadate-banner-logo {
+  .ideadate-chat-float,
+  .ideadate-chat-card,
+  .ideadate-chat-logo {
     animation: none;
   }
 }
