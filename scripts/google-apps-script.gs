@@ -28,6 +28,120 @@ var COL = {
 var TRIP_FIELD_COUNT = 37;
 var PAYMENT_COL_COUNT = 10;
 
+function getNotifyEmails() {
+  var raw = PropertiesService.getScriptProperties().getProperty("NOTIFY_EMAIL");
+  if (!raw) return [];
+
+  return raw
+    .split(/[,;]/)
+    .map(function (email) {
+      return email.trim();
+    })
+    .filter(Boolean);
+}
+
+function getSpreadsheetUrl() {
+  try {
+    return SpreadsheetApp.getActiveSpreadsheet().getUrl();
+  } catch (err) {
+    return "";
+  }
+}
+
+function sendEntryNotification(subject, body) {
+  var recipients = getNotifyEmails();
+  if (!recipients.length) return;
+
+  try {
+    MailApp.sendEmail({
+      to: recipients.join(","),
+      subject: subject,
+      body: body,
+      name: "Ceylon Unscripted Website",
+    });
+  } catch (err) {
+    Logger.log(
+      "Notification email failed: " + (err && err.message ? err.message : String(err))
+    );
+  }
+}
+
+function notifyNewTripRequest(data) {
+  var first = String(data["First Name"] || "").trim();
+  var last = String(data["Last Name"] || "").trim();
+  var name = [first, last].filter(Boolean).join(" ") || "Unknown";
+  var subject = "New Plan My Trip request — " + name;
+  var lines = [
+    "A new tour request was submitted on Ceylon Unscripted.",
+    "",
+    "Contact",
+    "  Name: " + name,
+    "  Email: " + String(data["Email Address"] || ""),
+    "  Phone: " + String(data["Phone / WhatsApp"] || ""),
+    "  Country: " + String(data["Country of Residence"] || ""),
+    "",
+    "Trip",
+    "  Arrival: " + String(data["Arrival Date"] || ""),
+    "  Departure: " + String(data["Departure Date"] || ""),
+    "  Days: " + String(data["Number of Days"] || ""),
+    "  Adults: " + String(data["Adults"] || ""),
+    "  Destinations: " + String(data["Destinations"] || ""),
+    "  Budget: " + String(data["Budget"] || ""),
+  ];
+
+  var sheetUrl = getSpreadsheetUrl();
+  if (sheetUrl) {
+    lines.push("", "Open your Google Sheet:", sheetUrl);
+  }
+
+  sendEntryNotification(subject, lines.join("\n"));
+}
+
+function notifyNewReview(data) {
+  var name = String(data.name || "").trim() || "Unknown";
+  var subject = "New customer review — " + name;
+  var lines = [
+    "A new review was submitted on Ceylon Unscripted.",
+    "",
+    "  Name: " + name,
+    "  Country: " + String(data.country || ""),
+    "  Visit: " + String(data.month || "") + " " + String(data.year || ""),
+    "  Rating: " + String(data.rating || "") + " / 5",
+    "",
+    "Review:",
+    String(data.review || ""),
+  ];
+
+  var sheetUrl = getSpreadsheetUrl();
+  if (sheetUrl) {
+    lines.push("", "Open your Google Sheet:", sheetUrl);
+  }
+
+  sendEntryNotification(subject, lines.join("\n"));
+}
+
+function notifyNewPayment(data, totals) {
+  var quotation = String(data.quotation || "").trim() || "Unknown";
+  var subject = "Payment received — " + quotation;
+  var lines = [
+    "A payment was recorded on Ceylon Unscripted.",
+    "",
+    "  Quotation: " + quotation,
+    "  Payment: USD " + String(data.paymentAmount || ""),
+    "  Milestone: " + String(data.milestoneLabel || data.milestone || ""),
+    "  Total paid: USD " + String(totals.totalPaid || ""),
+    "  Amount owed: USD " + String(totals.amountOwed || ""),
+    "  Status: " + String(totals.status || ""),
+  ];
+
+  var sheetUrl = getSpreadsheetUrl();
+  if (sheetUrl) {
+    lines.push("", "Open your Google Sheet:", sheetUrl);
+  }
+
+  sendEntryNotification(subject, lines.join("\n"));
+}
+
 function doPost(e) {
   try {
     if (!e || !e.postData || !e.postData.contents) {
@@ -87,6 +201,7 @@ function submitTrip(data) {
   }
 
   sheet.appendRow(row);
+  notifyNewTripRequest(data);
   return json({ ok: true });
 }
 
@@ -218,6 +333,13 @@ function recordPayment(data) {
   sheet.getRange(rowIndex, COL.TRANSACTION_REFS).setValue(
     appendTransactionRef(existingRefs, newRef)
   );
+
+  var paymentTotals = {
+    totalPaid: roundMoney(totalPaid),
+    amountOwed: roundMoney(amountOwed),
+    status: status,
+  };
+  notifyNewPayment(data, paymentTotals);
 
   return json({
     ok: true,
@@ -417,6 +539,8 @@ function submitReview(data) {
       displayStatus,
     ]);
 
+    notifyNewReview(data);
+
     return json({
       ok: true,
       displayStatus: displayStatus,
@@ -471,6 +595,27 @@ function json(obj) {
   return ContentService.createTextOutput(JSON.stringify(obj)).setMimeType(
     ContentService.MimeType.JSON
   );
+}
+
+/**
+ * Run from the editor (Run ▶) after setting NOTIFY_EMAIL in Script properties.
+ * Sends a sample trip-request email without adding a sheet row.
+ */
+function testNotificationEmail() {
+  notifyNewTripRequest({
+    "First Name": "Test",
+    "Last Name": "Traveler",
+    "Email Address": "test@example.com",
+    "Phone / WhatsApp": "+1 555 0100",
+    "Country of Residence": "United States",
+    "Arrival Date": "2026-09-01",
+    "Departure Date": "2026-09-14",
+    "Number of Days": "14",
+    Adults: "2",
+    Destinations: "Kandy, Ella, Galle",
+    Budget: "USD 300-500 Comfort",
+  });
+  return "If NOTIFY_EMAIL is set, check your inbox (and spam).";
 }
 
 /**

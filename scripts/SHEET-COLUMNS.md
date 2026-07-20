@@ -138,3 +138,20 @@ Same as Plan My Trip — one Web App, one secret:
 - `GOOGLE_APPS_SCRIPT_SECRET`
 
 No extra variables for payments.
+
+---
+
+## Email notifications (optional)
+
+Get an email when someone submits **Plan My Trip**, **Share Your Story**, or completes a **payment**.
+
+1. Open your sheet → **Extensions → Apps Script**
+2. **Project Settings** (gear) → **Script properties** → **Add script property**
+3. **Property:** `NOTIFY_EMAIL`
+4. **Value:** your email address (e.g. `hello@ceylonunscripted.com`)
+   - Multiple addresses: separate with commas (`you@example.com, team@example.com`)
+5. Paste the latest `scripts/google-apps-script.gs` from this repo and **Save**
+6. The first time email runs, Google may ask you to **re-authorize** the script (approve Gmail send access)
+7. Test: submit a trip request on the site — you should receive an email within a minute
+
+If no email arrives, check spam and confirm `NOTIFY_EMAIL` is set correctly in Script properties.
