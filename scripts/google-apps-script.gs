@@ -30,14 +30,66 @@ var PAYMENT_COL_COUNT = 10;
 
 function getNotifyEmails() {
   var raw = PropertiesService.getScriptProperties().getProperty("NOTIFY_EMAIL");
-  if (!raw) return [];
+  if (raw) {
+    var configured = raw
+      .split(/[,;]/)
+      .map(function (email) {
+        return email.trim();
+      })
+      .filter(Boolean);
+    if (configured.length) return configured;
+  }
 
-  return raw
-    .split(/[,;]/)
-    .map(function (email) {
-      return email.trim();
-    })
-    .filter(Boolean);
+  // Fallback when NOTIFY_EMAIL is unset: script owner (requires Web App
+  // deployment "Execute as: Me", not "User accessing the web app").
+  try {
+    var ownerEmail = Session.getEffectiveUser().getEmail();
+    if (ownerEmail) return [ownerEmail];
+  } catch (err) {
+    Logger.log("Could not resolve script owner email: " + err);
+  }
+
+  return [];
+}
+
+function getEmailSetupIssue() {
+  var recipients = getNotifyEmails();
+  if (!recipients.length) {
+    return (
+      "No notification recipients. Set NOTIFY_EMAIL in Script properties, " +
+      "or deploy the Web App as Execute as: Me (not User accessing the web app)."
+    );
+  }
+
+  try {
+    if (MailApp.getRemainingDailyQuota() <= 0) {
+      return "Daily email quota exhausted.";
+    }
+  } catch (err) {
+    return "MailApp not authorized: " + (err && err.message ? err.message : String(err));
+  }
+
+  return "";
+}
+
+function checkEmailSetup() {
+  var issue = getEmailSetupIssue();
+  var quota = null;
+  if (!issue) {
+    try {
+      quota = MailApp.getRemainingDailyQuota();
+    } catch (err) {
+      issue = "MailApp not authorized: " + (err && err.message ? err.message : String(err));
+    }
+  }
+
+  return {
+    recipients: getNotifyEmails(),
+    issue: issue,
+    quota: quota,
+    lastError:
+      PropertiesService.getScriptProperties().getProperty("LAST_EMAIL_ERROR") || "",
+  };
 }
 
 function getSpreadsheetUrl() {
@@ -49,8 +101,14 @@ function getSpreadsheetUrl() {
 }
 
 function sendEntryNotification(subject, body) {
+  var setupIssue = getEmailSetupIssue();
+  if (setupIssue) {
+    PropertiesService.getScriptProperties().setProperty("LAST_EMAIL_ERROR", setupIssue);
+    Logger.log("Notification email skipped: " + setupIssue);
+    return { sent: false, error: setupIssue, skipped: true, recipients: [] };
+  }
+
   var recipients = getNotifyEmails();
-  if (!recipients.length) return;
 
   try {
     MailApp.sendEmail({
@@ -59,10 +117,13 @@ function sendEntryNotification(subject, body) {
       body: body,
       name: "Ceylon Unscripted Website",
     });
+    PropertiesService.getScriptProperties().deleteProperty("LAST_EMAIL_ERROR");
+    return { sent: true, error: "", recipients: recipients };
   } catch (err) {
-    Logger.log(
-      "Notification email failed: " + (err && err.message ? err.message : String(err))
-    );
+    var message = err && err.message ? err.message : String(err);
+    PropertiesService.getScriptProperties().setProperty("LAST_EMAIL_ERROR", message);
+    Logger.log("Notification email failed: " + message);
+    return { sent: false, error: message, recipients: recipients };
   }
 }
 
@@ -94,7 +155,7 @@ function notifyNewTripRequest(data) {
     lines.push("", "Open your Google Sheet:", sheetUrl);
   }
 
-  sendEntryNotification(subject, lines.join("\n"));
+  return sendEntryNotification(subject, lines.join("\n"));
 }
 
 function notifyNewReview(data) {
@@ -117,7 +178,7 @@ function notifyNewReview(data) {
     lines.push("", "Open your Google Sheet:", sheetUrl);
   }
 
-  sendEntryNotification(subject, lines.join("\n"));
+  return sendEntryNotification(subject, lines.join("\n"));
 }
 
 function notifyNewPayment(data, totals) {
@@ -139,7 +200,7 @@ function notifyNewPayment(data, totals) {
     lines.push("", "Open your Google Sheet:", sheetUrl);
   }
 
-  sendEntryNotification(subject, lines.join("\n"));
+  return sendEntryNotification(subject, lines.join("\n"));
 }
 
 function doPost(e) {
@@ -201,8 +262,8 @@ function submitTrip(data) {
   }
 
   sheet.appendRow(row);
-  notifyNewTripRequest(data);
-  return json({ ok: true });
+  var notification = notifyNewTripRequest(data);
+  return json({ ok: true, notification: notification });
 }
 
 function findBookingRow(sheet, quotation) {
@@ -339,10 +400,11 @@ function recordPayment(data) {
     amountOwed: roundMoney(amountOwed),
     status: status,
   };
-  notifyNewPayment(data, paymentTotals);
+  var notification = notifyNewPayment(data, paymentTotals);
 
   return json({
     ok: true,
+    notification: notification,
     quotation: quotation,
     totalPaid: roundMoney(totalPaid),
     percentPaid: percentPaid,
@@ -539,10 +601,11 @@ function submitReview(data) {
       displayStatus,
     ]);
 
-    notifyNewReview(data);
+    var notification = notifyNewReview(data);
 
     return json({
       ok: true,
+      notification: notification,
       displayStatus: displayStatus,
       photoCount: photoUrls.length,
       folderId: getReviewsPhotoFolder().getId(),
@@ -602,7 +665,13 @@ function json(obj) {
  * Sends a sample trip-request email without adding a sheet row.
  */
 function testNotificationEmail() {
-  notifyNewTripRequest({
+  var setup = checkEmailSetup();
+  if (setup.issue) {
+    Logger.log(setup);
+    return setup;
+  }
+
+  var notification = notifyNewTripRequest({
     "First Name": "Test",
     "Last Name": "Traveler",
     "Email Address": "test@example.com",
@@ -615,7 +684,14 @@ function testNotificationEmail() {
     Destinations: "Kandy, Ella, Galle",
     Budget: "USD 300-500 Comfort",
   });
-  return "If NOTIFY_EMAIL is set, check your inbox (and spam).";
+
+  return {
+    setup: setup,
+    notification: notification,
+    message: notification.sent
+      ? "Test email sent to " + notification.recipients.join(", ") + ". Check inbox and spam."
+      : "Email failed: " + notification.error,
+  };
 }
 
 /**
@@ -625,7 +701,19 @@ function testNotificationEmail() {
 function authorizeScript() {
   SpreadsheetApp.getActiveSpreadsheet().getName();
   DriveApp.getRootFolder().getId();
-  return "Authorization OK — save and use your existing Web App deployment URL.";
+  var setup = checkEmailSetup();
+  if (setup.issue) {
+    return (
+      "Spreadsheet + Drive OK. Email setup issue: " +
+      setup.issue +
+      " — fix this, then run testNotificationEmail."
+    );
+  }
+  return (
+    "Authorization OK — email can send to " +
+    setup.recipients.join(", ") +
+    ". Run testNotificationEmail to confirm."
+  );
 }
 
 /**

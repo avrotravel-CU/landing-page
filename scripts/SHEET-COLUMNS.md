@@ -145,13 +145,31 @@ No extra variables for payments.
 
 Get an email when someone submits **Plan My Trip**, **Share Your Story**, or completes a **payment**.
 
-1. Open your sheet → **Extensions → Apps Script**
-2. **Project Settings** (gear) → **Script properties** → **Add script property**
-3. **Property:** `NOTIFY_EMAIL`
-4. **Value:** your email address (e.g. `hello@ceylonunscripted.com`)
-   - Multiple addresses: separate with commas (`you@example.com, team@example.com`)
-5. Paste the latest `scripts/google-apps-script.gs` from this repo and **Save**
-6. The first time email runs, Google may ask you to **re-authorize** the script (approve Gmail send access)
-7. Test: submit a trip request on the site — you should receive an email within a minute
+### Setup
 
-If no email arrives, check spam and confirm `NOTIFY_EMAIL` is set correctly in Script properties.
+1. Open your sheet → **Extensions → Apps Script**
+2. Paste the latest `scripts/google-apps-script.gs` from this repo and **Save**
+3. **Project Settings** (gear) → **Script properties** → **Add script property**
+   - **Property:** `NOTIFY_EMAIL`
+   - **Value:** your email (e.g. `hello@ceylonunscripted.com`)
+   - Multiple addresses: separate with commas (`you@example.com, team@example.com`)
+   - If omitted, emails go to the Google account that owns the script (see deployment below)
+4. **Deploy → Manage deployments** → edit your Web App:
+   - **Execute as:** **Me** (your Google account) — **required for email**
+   - **Who has access:** Anyone
+   - Click **Deploy** (new version if prompted)
+5. In the Apps Script editor, select **`authorizeScript`** → **Run ▶** → approve all permissions (Spreadsheet, Drive, **Gmail send**)
+6. Select **`testNotificationEmail`** → **Run ▶** → check your inbox (and spam)
+
+### If no email arrives
+
+| Check | What to do |
+|-------|------------|
+| Script not updated | GitHub push does **not** update Apps Script — paste the latest `.gs` file manually |
+| Wrong deployment | Web App must be **Execute as: Me**, not "User accessing the web app" |
+| Permissions | Run `authorizeScript` and `testNotificationEmail` once; approve Gmail send access |
+| `NOTIFY_EMAIL` typo | Confirm property name is exactly `NOTIFY_EMAIL` |
+| Spam folder | Search for subject "New Plan My Trip request" |
+| Last error | After a failed send, Script properties may show `LAST_EMAIL_ERROR` |
+
+Trip/review/payment API responses now include a `notification` object (`sent`, `error`, `recipients`) for debugging in Vercel function logs.

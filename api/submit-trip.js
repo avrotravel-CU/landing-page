@@ -59,6 +59,10 @@ export default async function handler(req, res) {
       return res.status(502).json({ error: detail });
     }
 
+    if (parsed.notification && parsed.notification.sent !== true) {
+      console.warn("Trip saved but notification email failed:", parsed.notification);
+    }
+
     return res.status(200).json({ ok: true });
   } catch (err) {
     console.error("submit-trip error:", err);

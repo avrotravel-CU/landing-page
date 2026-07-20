@@ -117,6 +117,10 @@ export default async function handler(req, res) {
       });
     }
 
+    if (parsed.notification && parsed.notification.sent !== true) {
+      console.warn("Payment saved but notification email failed:", parsed.notification);
+    }
+
     return res.status(200).json(parsed);
   } catch (err) {
     console.error("record-payment error:", err);
