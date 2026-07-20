@@ -1,5 +1,6 @@
 import { Routes, Route } from "react-router-dom";
 import Header from "./components/Header";
+import IdeaDateFloatingBadge from "./components/IdeaDateFloatingBadge";
 import Footer from "./components/Footer";
 import useGoogleAnalytics from "./hooks/useGoogleAnalytics";
 import usePageTitle from "./hooks/usePageTitle";
@@ -19,6 +20,7 @@ export default function App() {
   return (
     <div className="min-h-screen bg-white">
       <Header />
+      <IdeaDateFloatingBadge />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/tour-packages" element={<TourPackages />} />

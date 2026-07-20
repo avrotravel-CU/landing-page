@@ -20,7 +20,7 @@ export default function Header() {
   const isActive = (href: string) => href === pathname;
 
   return (
-    <header className="sticky top-0 z-50 w-full bg-white/95 backdrop-blur-sm border-b border-forest-100">
+    <header className="sticky top-0 z-50 w-full border-b border-forest-100 bg-white/95 backdrop-blur-sm">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 lg:px-10">
         <Link to="/" className="flex min-w-0 items-center gap-3">
           <img
