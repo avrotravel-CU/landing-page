@@ -526,7 +526,32 @@ function getReviewColumnIndexes(sheet) {
 function formatReviewLocation(town, country) {
   town = String(town || "").trim();
   country = String(country || "").trim();
+
+  var monthNames = {
+    january: true,
+    february: true,
+    march: true,
+    april: true,
+    may: true,
+    june: true,
+    july: true,
+    august: true,
+    september: true,
+    october: true,
+    november: true,
+    december: true,
+  };
+
+  // Misaligned rows (old script + new Town column) may have a month in the town cell.
+  if (town && monthNames[town.toLowerCase()]) {
+    town = "";
+  }
+
   if (town && country) return town + ", " + country;
+
+  // Legacy rows sometimes stored "Toronto, Canada" entirely in the Country column.
+  if (country.indexOf(",") !== -1) return country;
+
   return town || country;
 }
 
@@ -640,7 +665,19 @@ function submitReview(data) {
     var rating = Number(data.rating);
     var reviewText = String(data.review || "").trim();
 
-    if (!name || !town || !country || !month || !year || !reviewText) {
+    if (!name || !month || !year || !reviewText) {
+      return json({ ok: false, error: "Missing required review fields" });
+    }
+
+    if (town && country.indexOf(",") !== -1 && country.indexOf(town) === 0) {
+      country = country.slice(country.indexOf(",") + 1).trim();
+    } else if (!town && country.indexOf(",") !== -1) {
+      var commaIdx = country.indexOf(",");
+      town = country.slice(0, commaIdx).trim();
+      country = country.slice(commaIdx + 1).trim();
+    }
+
+    if (!town || !country) {
       return json({ ok: false, error: "Missing required review fields" });
     }
     if (!rating || rating < 1 || rating > 5) {
@@ -707,11 +744,14 @@ function listReviews() {
 
     var town = cols.town >= 0 ? String(row[cols.town] || "").trim() : "";
     var country = String(row[cols.country] || "").trim();
+    var location = formatReviewLocation(town, country);
 
     reviews.push({
       id: "review-" + (i + 2),
       name: String(row[cols.name] || ""),
-      location: formatReviewLocation(town, country),
+      town: town,
+      country: country,
+      location: location,
       visited:
         String(row[cols.visitMonth] || "") + " " + String(row[cols.visitYear] || ""),
       quote: String(row[cols.review] || ""),

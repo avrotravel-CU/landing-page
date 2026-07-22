@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import CustomerReviewsSection from "../components/CustomerReviewsSection";
 import ShareYourStory from "../components/ShareYourStory";
+import { formatReviewLocation } from "../lib/reviewLocation";
 import {
   experiences,
   experienceCategories,
@@ -16,7 +17,7 @@ function mapCustomerReview(r: CustomerReview): Testimonial {
   return {
     id: r.id,
     name: r.name,
-    location: r.location,
+    location: formatReviewLocation(r.town, r.country, r.location),
     visited: r.visited.trim(),
     quote: r.quote,
     rating: r.rating,

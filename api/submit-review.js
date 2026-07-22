@@ -41,7 +41,8 @@ export default async function handler(req, res) {
         secret: sharedSecret,
         name,
         town,
-        country,
+        // Combined for older Apps Script that only stored Country; newer script splits using town.
+        country: town && country ? `${town}, ${country}` : country,
         month,
         year,
         rating,
