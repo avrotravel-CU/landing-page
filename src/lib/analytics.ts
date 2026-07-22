@@ -31,6 +31,11 @@ export function initGoogleAnalytics() {
   const script = document.createElement("script");
   script.async = true;
   script.src = `https://www.googletagmanager.com/gtag/js?id=${measurementId}`;
+  script.onload = () => {
+    trackPageView(
+      `${window.location.pathname}${window.location.search}${window.location.hash}`
+    );
+  };
   document.head.appendChild(script);
 }
 
@@ -38,7 +43,8 @@ export function trackPageView(path: string) {
   const measurementId = getGaMeasurementId();
   if (!measurementId || typeof window.gtag !== "function") return;
 
-  window.gtag("event", "page_view", {
+  // GA4 recommended SPA approach — updates page_path on each route change.
+  window.gtag("config", measurementId, {
     page_path: path,
     page_location: window.location.href,
     page_title: document.title,
