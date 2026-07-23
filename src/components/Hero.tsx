@@ -1,14 +1,18 @@
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import heroPoster from "../assets/visit_sri_Lanka_Ceylon.jpg";
+import { SITE_NAME, SITE_TAGLINE } from "../lib/siteBranding";
 
 export default function Hero() {
   return (
     <section id="home" className="bg-forest-900">
       <div className="mx-auto grid max-w-7xl grid-cols-1 items-center gap-10 px-6 py-16 lg:grid-cols-2 lg:px-10 lg:py-20">
         <div>
-          <h1 className="font-serif text-4xl font-bold leading-[1.08] text-white sm:text-5xl lg:text-[3.4rem]">
-            A love letter from Sri Lanka
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-gold-400">
+            {SITE_NAME}
+          </p>
+          <h1 className="mt-3 font-serif text-4xl font-bold leading-[1.08] text-white sm:text-5xl lg:text-[3.4rem]">
+            {SITE_TAGLINE}
           </h1>
           <p className="mt-5 max-w-md text-[15px] leading-relaxed text-forest-100/90">
             Discover Sri Lanka beyond the guidebook. Your journey is shaped
@@ -33,7 +37,7 @@ export default function Hero() {
         <div className="flex justify-center lg:justify-end">
           <img
             src={heroPoster}
-            alt="Ceylon Unscripted — A love letter from Sri Lanka"
+            alt={`${SITE_NAME}, ${SITE_TAGLINE}`}
             className="aspect-square w-full max-w-[320px] rounded-2xl object-cover shadow-2xl"
           />
         </div>

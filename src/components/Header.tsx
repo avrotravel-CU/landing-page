@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import logo from "../assets/shell-icon.png";
-import { pageTitleForPath } from "../lib/pageTitles";
+import { SITE_NAME, SITE_TAGLINE } from "../lib/siteBranding";
 
 const NAV_LINKS = [
   { label: "Home", href: "/" },
@@ -15,7 +15,6 @@ const NAV_LINKS = [
 export default function Header() {
   const [open, setOpen] = useState(false);
   const { pathname } = useLocation();
-  const pageName = pageTitleForPath(pathname);
 
   const isActive = (href: string) => href === pathname;
 
@@ -28,8 +27,21 @@ export default function Header() {
             alt="Ceylon Unscripted"
             className="h-14 w-14 shrink-0 object-contain sm:h-16 sm:w-16"
           />
-          <span className="min-w-0 truncate text-sm font-semibold text-forest-900 sm:text-[15px]">
-            Ceylon Unscripted - {pageName}
+          <span
+            className={`min-w-0 text-sm font-semibold text-forest-900 sm:text-[15px] ${
+              pathname === "/" ? "" : "truncate"
+            }`}
+          >
+            {pathname === "/" ? (
+              <>
+                {SITE_NAME}
+                <span className="mt-0.5 block text-[11px] font-medium text-gold-600 sm:text-xs">
+                  {SITE_TAGLINE}
+                </span>
+              </>
+            ) : (
+              SITE_NAME
+            )}
           </span>
         </Link>
 

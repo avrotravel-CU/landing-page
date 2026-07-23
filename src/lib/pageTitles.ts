@@ -1,3 +1,5 @@
+import { SITE_NAME } from "./siteBranding";
+
 export const PAGE_TITLES: Record<string, string> = {
   "/": "Home",
   "/tour-packages": "Tour Packages",
@@ -14,5 +16,6 @@ export function pageTitleForPath(pathname: string): string {
 }
 
 export function documentTitleForPath(pathname: string): string {
-  return `Ceylon Unscripted - ${pageTitleForPath(pathname)}`;
+  if (pathname === "/") return SITE_NAME;
+  return `${pageTitleForPath(pathname)}, ${SITE_NAME}`;
 }

@@ -22,6 +22,7 @@ import {
   PRIVACY_STATEMENT_TITLE,
 } from "../data/privacyStatement";
 import { getPlanPrefillFromPackage } from "../lib/tourPackagePrefill";
+import { SITE_NAME, SITE_TAGLINE } from "../lib/siteBranding";
 
 function parseDateOnly(value: string): Date | null {
   const [year, month, day] = value.split("-").map(Number);
@@ -1511,7 +1512,7 @@ export default function Plan() {
 
                   <img
                     src={planCollage}
-                    alt="Ceylon Unscripted — A love letter from Sri Lanka"
+                    alt={`${SITE_NAME}, ${SITE_TAGLINE}`}
                     className="mt-5 aspect-square w-full rounded-xl object-cover shadow-sm"
                   />
 
