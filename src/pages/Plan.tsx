@@ -1511,7 +1511,7 @@ export default function Plan() {
 
                   <img
                     src={planCollage}
-                    alt="Ceylon Unscripted — Real Places. Real People. Real Stories."
+                    alt="Ceylon Unscripted — A love letter from Sri Lanka"
                     className="mt-5 aspect-square w-full rounded-xl object-cover shadow-sm"
                   />
 
