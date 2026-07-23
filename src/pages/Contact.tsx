@@ -76,7 +76,11 @@ const SOCIAL_LINKS = [
     label: "Facebook",
     href: "https://www.facebook.com/CeylonUnscripted",
   },
-  { icon: InstagramIcon, label: "Instagram" },
+  {
+    icon: InstagramIcon,
+    label: "Instagram",
+    href: "https://www.instagram.com/ceylon.unscripted/",
+  },
   { icon: YoutubeIcon, label: "YouTube" },
 ];
 
