@@ -38,7 +38,7 @@ export default function PaymentDeclined() {
             Payment Declined
           </h1>
           <p className="mx-auto mt-3 max-w-md text-sm leading-relaxed text-white/85">
-            Don&apos;t worry — your booking details are saved. Let&apos;s get
+            Don&apos;t worry, your booking details are saved. Let&apos;s get
             this sorted.
           </p>
         </div>

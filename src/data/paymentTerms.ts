@@ -21,7 +21,7 @@ export const PAYMENT_TERMS_SECTIONS: TermsSection[] = [
   {
     title: "1. Payment Structure",
     intro:
-      "All tour bookings with Ceylon Unscripted follow a simple three-step payment schedule.",
+      "All tour bookings with Ceylon Unscripted follow a simple three step payment schedule.",
     bullets: [
       {
         label: "25% Deposit at Booking",
@@ -90,20 +90,20 @@ export const PAYMENT_TERMS_SECTIONS: TermsSection[] = [
     ],
   },
   {
-    title: "7. Liability and Third-Party Services",
+    title: "7. Liability and Third Party Services",
     intro:
       "Ceylon Unscripted provides curated travel experiences through trusted partners. However, we do not control or manage any personal or commercial activities you may choose to engage in outside your confirmed itinerary.",
     paragraphs: ["By booking with us, you agree to the following:"],
     listItems: [
       "Ceylon Unscripted is not responsible for any extra services, purchases, or agreements made directly with your driver, guide, hotel staff, or any other individual or business in Sri Lanka.",
       "Any additional activities, upgrades, purchases, or side arrangements made outside your official tour plan are done at your own risk.",
-      "Ceylon Unscripted holds no liability for losses, disputes, damages, or issues arising from third-party interactions or personal agreements not booked through our platform.",
+      "Ceylon Unscripted holds no liability for losses, disputes, damages, or issues arising from third party interactions or personal agreements not booked through our platform.",
     ],
     introAfterList: "This includes but is not limited to:",
     listItemsAfter: [
       "Personal shopping or commissions",
       "Extra excursions or transport",
-      "Hotel upgrades or add-ons",
+      "Hotel upgrades or add ons",
       "Any private business dealings with individuals or companies",
     ],
     closingParagraph:

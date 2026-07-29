@@ -66,7 +66,7 @@ const CONTACT_DETAILS = [
   {
     icon: Clock,
     label: "Office Hours",
-    value: "Mon–Sat, 8am–6pm (IST)",
+    value: "Mon to Sat, 8am to 6pm (IST)",
   },
 ];
 

@@ -107,7 +107,7 @@ export function getPaymentSchedule(
           },
         ],
         scheduleNote:
-          "You qualify for our 3-step plan: 25% now, 50% at 60 days, and 25% at 30 days before travel.",
+          "You qualify for our 3 step plan: 25% now, 50% at 60 days, and 25% at 30 days before travel.",
         daysTillArrival,
         totalPaid,
         amountOwed,
@@ -125,14 +125,14 @@ export function getPaymentSchedule(
           options: [
             {
               id: "prearrival",
-              label: "50% Pre-Arrival Payment",
+              label: "50% Pre Arrival Payment",
               timing: "60 days before travel",
               paymentAmount,
               remaining: roundMoney(tourAmount - totalPaid - paymentAmount),
               isFullyPaid: false,
             },
           ],
-          scheduleNote: "Your 50% pre-arrival payment is due now.",
+          scheduleNote: "Your 50% pre arrival payment is due now.",
           daysTillArrival,
           totalPaid,
           amountOwed,
@@ -172,7 +172,7 @@ export function getPaymentSchedule(
       return {
         options: [],
         scheduleNote:
-          "Your pre-arrival payment is recorded. The final 25% is due 30 days before travel.",
+          "Your pre arrival payment is recorded. The final 25% is due 30 days before travel.",
         daysTillArrival,
         totalPaid,
         amountOwed,
@@ -186,7 +186,7 @@ export function getPaymentSchedule(
         {
           id: "combined75",
           label: "75% Combined Payment",
-          timing: "Deposit + pre-arrival (required now)",
+          timing: "Deposit + pre arrival (required now)",
           paymentAmount: combined75,
           remaining: balanceAmount,
           isFullyPaid: false,
@@ -243,7 +243,7 @@ export function getPaymentSchedule(
     options: [
       {
         id: "catchup",
-        label: "Catch-Up Payment",
+        label: "Catch Up Payment",
         timing: "Bring balance to 75% required",
         paymentAmount: catchupAmount,
         remaining: balanceAmount,

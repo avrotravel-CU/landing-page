@@ -16,7 +16,7 @@ export const PAYMENT_MILESTONES: PaymentMilestone[] = [
   },
   {
     id: "prearrival",
-    label: "50% Pre-Arrival Payment",
+    label: "50% Pre Arrival Payment",
     percent: 0.5,
     timing: "60 days before travel",
   },

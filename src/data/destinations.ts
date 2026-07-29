@@ -40,7 +40,7 @@ export const destinations: Destination[] = [
     name: "Sigiriya",
     region: "Cultural Triangle",
     description:
-      "Climb the iconic Lion Rock fortress rising 200m above the jungle, with world-class frescoes and water gardens.",
+      "Climb the iconic Lion Rock fortress rising 200m above the jungle, with world class frescoes and water gardens.",
     image: sigiriya,
   },
   {

@@ -99,9 +99,9 @@ function budgetOptionForPackage(price: string, dayCount: number): string {
   if (!dayCount) return "";
   const perDay = parseTotalPrice(price) / dayCount;
   if (perDay < 150) return "Under USD 150";
-  if (perDay < 300) return "USD 150-300";
-  if (perDay < 500) return "USD 300-500";
-  if (perDay < 1000) return "USD 500-1,000";
+  if (perDay < 300) return "USD 150 to 300";
+  if (perDay < 500) return "USD 300 to 500";
+  if (perDay < 1000) return "USD 500 to 1,000";
   return "USD 1,000+";
 }
 

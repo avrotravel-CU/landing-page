@@ -110,7 +110,7 @@ export const experiences: Experience[] = [
     category: "Food",
     image: teaFactory,
     description:
-      "Tour a working tea factory in Nuwara Eliya and taste freshly plucked single-estate teas.",
+      "Tour a working tea factory in Nuwara Eliya and taste freshly plucked single estate teas.",
   },
   {
     name: "Elephant Safari, Udawalawe",
@@ -145,6 +145,6 @@ export const experiences: Experience[] = [
     category: "Water",
     image: surfLessons,
     description:
-      "World-ranked surf point perfect for beginners and advanced surfers alike.",
+      "World ranked surf point perfect for beginners and advanced surfers alike.",
   },
 ];

@@ -76,7 +76,7 @@ function CustomerPhotosCarousel({ reviews }: { reviews: Testimonial[] }) {
       reviews.flatMap((r) =>
         (r.photos ?? []).slice(0, 3).map((src, i) => ({
           src,
-          alt: `${r.name} — photo ${i + 1}`,
+          alt: `${r.name}, photo ${i + 1}`,
           key: `${r.id ?? r.name}-${i}`,
         }))
       ),
@@ -274,7 +274,7 @@ export default function CustomerReviewsSection({ reviews }: Props) {
         <p className="text-sm text-forest-950/60">
           {filteredSorted.length === 0
             ? "No reviews match your search"
-            : `Showing 1–${showingEnd} of ${filteredSorted.length} reviews`}
+            : `Showing 1 to ${showingEnd} of ${filteredSorted.length} reviews`}
         </p>
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
           <div className="flex overflow-hidden rounded-md border border-gold-200 bg-white">

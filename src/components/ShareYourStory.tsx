@@ -281,7 +281,7 @@ export default function ShareYourStory({ onSubmitted }: Props) {
                 Add Photos
               </span>
               <p className="mb-2 text-xs text-forest-950/50">
-                Optional — up to {MAX_PHOTOS} photos
+                Optional, up to {MAX_PHOTOS} photos
               </p>
               <div
                 onDragOver={(e) => {

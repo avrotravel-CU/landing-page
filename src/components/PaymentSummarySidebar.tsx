@@ -20,7 +20,7 @@ export default function PaymentSummarySidebar({ booking, selectedOption }: Props
           {formatUsd(tourAmount)}
         </p>
         <p className="mt-1 text-xs text-forest-950/55">
-          Ref: {booking.quotation || "—"}
+          Ref: {booking.quotation || "N/A"}
         </p>
         {booking.daysTillArrival != null && (
           <p className="mt-1 text-xs text-forest-950/55">
@@ -34,7 +34,7 @@ export default function PaymentSummarySidebar({ booking, selectedOption }: Props
           This Payment
         </p>
         <p className="mt-2 font-serif text-xl font-bold text-forest-900">
-          {selectedOption ? formatUsd(selectedOption.paymentAmount) : "—"}
+          {selectedOption ? formatUsd(selectedOption.paymentAmount) : "N/A"}
         </p>
         <p className="mt-1 text-xs text-forest-950/55">
           {selectedOption ? selectedOption.label : "Select a payment option"}
@@ -64,7 +64,7 @@ export default function PaymentSummarySidebar({ booking, selectedOption }: Props
         ) : (
           <>
             <p className="mt-2 font-serif text-xl font-bold text-forest-900">
-              {selectedOption ? formatUsd(selectedOption.remaining) : "—"}
+              {selectedOption ? formatUsd(selectedOption.remaining) : "N/A"}
             </p>
             <p className="mt-1 text-xs text-forest-950/55">
               {selectedOption ? "Outstanding balance" : "Select a payment option"}

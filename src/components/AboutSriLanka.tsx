@@ -15,12 +15,12 @@ import faithChristianity from "../assets/faith/visit_sri_Lanka_Christianity.jpg"
 const QUICK_FACTS = [
   {
     label: "Climate",
-    value: "Tropical, warm year round (27-30°C)",
+    value: "Tropical, warm year round (27 to 30°C)",
     icon: Sun,
   },
   {
     label: "Best Time to Visit",
-    value: "Dec-Mar (South/West) - Jun-Sep (East)",
+    value: "Dec to Mar (South/West), Jun to Sep (East)",
     icon: CalendarDays,
   },
   {
@@ -48,7 +48,7 @@ const QUICK_FACTS = [
 const INFO_SECTIONS = [
   {
     title: "A Land Like No Other",
-    body: "Sri Lanka, once known as Ceylon, is a teardrop-shaped island off the southern tip of India, packed with more diversity per square kilometre than almost anywhere on earth. In a single day you can stand in an ancient ruined city, climb through a cloud forest, surf a world-class wave, and watch wild elephants cross a riverbank at sunset.",
+    body: "Sri Lanka, once known as Ceylon, is a teardrop shaped island off the southern tip of India, packed with more diversity per square kilometre than almost anywhere on earth. In a single day you can stand in an ancient ruined city, climb through a cloud forest, surf a world class wave, and watch wild elephants cross a riverbank at sunset.",
   },
   {
     title: "History & Culture",
@@ -60,7 +60,7 @@ const INFO_SECTIONS = [
   },
   {
     title: "Getting Around",
-    body: "The island is compact, most destinations are within a day's drive. The scenic hill-country train network is unmissable. For flexibility and comfort, a private driver-guide is the best way to travel, allowing you to stop at village markets, viewpoints and roadside eateries that no tour bus ever visits.",
+    body: "The island is compact, most destinations are within a day's drive. The scenic hill country train network is unmissable. For flexibility and comfort, a private driver guide is the best way to travel, allowing you to stop at village markets, viewpoints and roadside eateries that no tour bus ever visits.",
   },
 ];
 

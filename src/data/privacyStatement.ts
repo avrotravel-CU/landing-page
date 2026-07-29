@@ -47,7 +47,7 @@ export const PRIVACY_SECTIONS: TermsSection[] = [
   {
     title: "4. Data Security",
     paragraphs: [
-      "We take reasonable technical and organizational measures to protect your information from unauthorized access, alteration, disclosure, or loss. While no system is completely secure, we follow industry-standard practices to safeguard your data.",
+      "We take reasonable technical and organizational measures to protect your information from unauthorized access, alteration, disclosure, or loss. While no system is completely secure, we follow industry standard practices to safeguard your data.",
     ],
     dividerAfter: true,
   },

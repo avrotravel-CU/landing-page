@@ -142,7 +142,7 @@ export function PaymentTermsModal({
             onClick={onAccept}
             className="flex-1 rounded-full bg-forest-900 px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-forest-800"
           >
-            I Agree — Proceed with Payment
+            I Agree, Proceed with Payment
           </button>
         </div>
       </div>

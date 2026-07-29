@@ -27,7 +27,7 @@ const SCHEDULE_STEPS = [
   },
   {
     num: 2,
-    title: "Pre-Arrival",
+    title: "Pre Arrival",
     percent: "50% Payment",
     timing: "60 days before travel",
     desc: "Covers accommodation bookings and transport",
@@ -52,7 +52,7 @@ const FAQS = [
   },
   {
     q: "What is your cancellation and refund policy?",
-    a: "Cancellations 90+ days before travel receive a full refund minus 10% admin fee. 60-89 days: 50% refund. 30-59 days: 25% refund. Less than 30 days: no refund. We recommend travel insurance.",
+    a: "Cancellations 90+ days before travel receive a full refund minus 10% admin fee. 60 to 89 days: 50% refund. 30 to 59 days: 25% refund. Less than 30 days: no refund. We recommend travel insurance.",
   },
   {
     q: "Are there any additional fees or charges?",
@@ -278,7 +278,7 @@ export default function Payments() {
                 <Field
                   icon={FileText}
                   label="Quotation Number"
-                  placeholder="Enter your quotation number (e.g., CU-2026-001)"
+                  placeholder="Enter your quotation number from your quote email"
                   value={booking.quotation}
                   onChange={(e) => {
                     setLookupReady(false);
@@ -412,7 +412,7 @@ export default function Payments() {
                     Flexible Payment Terms
                   </p>
                   <p className="mt-0.5 text-[13px] text-blue-800/80">
-                    The 3-step plan (25% / 50% / 25%) applies when travel is 90+
+                    The 3 step plan (25% / 50% / 25%) applies when travel is 90+
                     days away. Within 90 days, 75% is due now and 25% at 30 days.
                     Less than 30 days before travel requires full payment.
                   </p>

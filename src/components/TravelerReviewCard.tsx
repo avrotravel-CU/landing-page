@@ -42,7 +42,7 @@ export default function TravelerReviewCard({ review, layout = "grid" }: Props) {
             <ReviewPhoto
               key={`${name}-photo-${i}`}
               src={src}
-              alt={`${name} — photo ${i + 1}`}
+              alt={`${name}, photo ${i + 1}`}
               className={
                 isCarousel || visiblePhotos.length === 1
                   ? "h-44 w-full object-cover"

@@ -30,7 +30,7 @@ export default function TourPackages() {
               >
                 <img
                   src={pkg.image}
-                  alt={`${pkg.name} – ${pkg.badge}`}
+                  alt={`${pkg.name}, ${pkg.badge}`}
                   className="h-44 w-full object-cover"
                 />
                 <div className="flex flex-1 flex-col p-5">

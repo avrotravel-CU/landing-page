@@ -122,7 +122,7 @@ const MEAL_PLANS = [
   { title: "Bed & Breakfast (B/B)", subtitle: "Breakfast and bed included" },
   { title: "Half Board", subtitle: "Breakfast and dinner included" },
   { title: "Full Board", subtitle: "All meals included" },
-  { title: "Bed Only", subtitle: "Room only — no meals needed" },
+  { title: "Bed Only", subtitle: "Room only, no meals needed" },
   { title: "Mixed Options", subtitle: "Different requirements by stay" },
 ];
 
@@ -167,7 +167,7 @@ const DRIVER_AGES = ["No Preference", "20s", "30s", "40s", "50+"];
 const FOOD_PREFS = [
   { label: "Everything", emoji: "🍽️" },
   { label: "Vegan", emoji: "🌱" },
-  { label: "Gluten-Free", emoji: "🌾" },
+  { label: "Gluten Free", emoji: "🌾" },
   { label: "No Beef", emoji: "🚫🐄" },
   { label: "Kosher", emoji: "✡️" },
   { label: "Vegetarian", emoji: "🥗" },
@@ -195,9 +195,9 @@ const CULTURAL_PREFS = [
 
 const BUDGET_OPTIONS = [
   { title: "Under USD 150", subtitle: "Budget Traveller" },
-  { title: "USD 150-300", subtitle: "Economy" },
-  { title: "USD 300-500", subtitle: "Comfort" },
-  { title: "USD 500-1,000", subtitle: "Luxury" },
+  { title: "USD 150 to 300", subtitle: "Economy" },
+  { title: "USD 300 to 500", subtitle: "Comfort" },
+  { title: "USD 500 to 1,000", subtitle: "Luxury" },
   { title: "USD 1,000+", subtitle: "Ultra Luxury" },
 ];
 
@@ -273,7 +273,7 @@ function TextInput(
 function DateInput({
   onChange,
   value,
-  placeholder = "YYYY-MM-DD",
+  placeholder = "Select date",
   ...props
 }: React.InputHTMLAttributes<HTMLInputElement> & { placeholder?: string }) {
   const inputRef = useRef<HTMLInputElement>(null);
@@ -655,9 +655,9 @@ export default function Plan() {
       line("Departure Date", departure),
       line("Number of Days", tripDays),
       line("Adults", adults),
-      line("Infants (0-2)", String(infants)),
-      line("Children (3-12)", String(children)),
-      line("Teens (13-17)", String(teens)),
+      line("Infants (0 to 2)", String(infants)),
+      line("Children (3 to 12)", String(children)),
+      line("Teens (13 to 17)", String(teens)),
       line("Travelling with Pets", pets),
       ...(pets === "Yes" ? [line("Pet Details", petDetails)] : []),
       "",
@@ -868,11 +868,11 @@ export default function Plan() {
                 <Info size={18} className="mt-0.5 shrink-0 text-blue-600" />
                 <div>
                   <p className="text-sm font-semibold text-blue-900">
-                    Entry tickets &amp; paid activities
+                    Entry tickets and paid activities
                   </p>
                   <p className="mt-1 text-sm leading-relaxed text-blue-800/85">
                     Entry tickets for places and fun activities are not included
-                    in your quote by default — you pay for these yourself on the
+                    in your quote by default. You pay for these yourself on the
                     day. If you&apos;d like them included in your quote, please
                     specify in your note below.
                   </p>
@@ -951,7 +951,7 @@ export default function Plan() {
                         <DateInput
                           value={arrival}
                           min={minArrivalDate}
-                          placeholder="YYYY-MM-DD"
+                          placeholder="Select date"
                           onChange={handleArrivalChange}
                         />
                         <p className="mt-1 text-xs text-forest-950/50">
@@ -964,7 +964,7 @@ export default function Plan() {
                         <DateInput
                           value={departure}
                           min={minDepartureDate}
-                          placeholder="YYYY-MM-DD"
+                          placeholder="Select date"
                           onChange={handleDepartureChange}
                         />
                       </label>
@@ -1074,7 +1074,7 @@ export default function Plan() {
                           <textarea
                             rows={2}
                             autoFocus
-                            placeholder="e.g. 1 small dog, 12kg, house-trained, needs a pet-friendly villa..."
+                            placeholder="e.g. 1 small dog, 12kg, house trained, needs a pet friendly villa..."
                             value={petDetails}
                             onChange={(e) => setPetDetails(e.target.value)}
                             className="w-full resize-none rounded-lg border border-forest-900/15 px-4 py-2.5 text-sm text-forest-950 placeholder:text-forest-950/35 outline-none transition focus:border-gold-400"

@@ -25,7 +25,7 @@ export const tourPackages: TourPackage[] = [
     badge: "Most Popular",
     image: ceylonClassicImg,
     days: "8 Days",
-    group: "2-6 People",
+    group: "2 to 6 People",
     rating: 4.9,
     description:
       "The essential Sri Lanka experience covering the Cultural Triangle, hill country, and the south coast.",
@@ -43,7 +43,7 @@ export const tourPackages: TourPackage[] = [
     badge: "Nature",
     image: wildlifeImg,
     days: "10 Days",
-    group: "2-8 People",
+    group: "2 to 8 People",
     rating: 4.8,
     description:
       "For the nature lover, big cats, elephant herds, blue whales and ancient rainforests.",
@@ -61,7 +61,7 @@ export const tourPackages: TourPackage[] = [
     badge: "Relaxation",
     image: beachBlissImg,
     days: "7 Days",
-    group: "2-4 People",
+    group: "2 to 4 People",
     rating: 4.7,
     description:
       "Sun, sea and total relaxation along Sri Lanka's stunning coastline, east and south.",
@@ -79,7 +79,7 @@ export const tourPackages: TourPackage[] = [
     badge: "Deep Dive",
     image: culturalImmersionImg,
     days: "12 Days",
-    group: "2-10 People",
+    group: "2 to 10 People",
     rating: 5,
     description:
       "Go beyond the surface, stay with locals, attend ceremonies, and explore ancient kingdoms.",
@@ -118,7 +118,7 @@ export const tourPackages: TourPackage[] = [
     group: "Families",
     rating: 4.8,
     description:
-      "Child-friendly adventures, wildlife wonder and cultural discovery, unforgettable for every age.",
+      "Child friendly adventures, wildlife wonder and cultural discovery, unforgettable for every age.",
     highlights: [
       "Elephant Orphanage",
       "Train Ride to Ella",
