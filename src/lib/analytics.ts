@@ -31,20 +31,14 @@ export function initGoogleAnalytics() {
   const script = document.createElement("script");
   script.async = true;
   script.src = `https://www.googletagmanager.com/gtag/js?id=${measurementId}`;
-  script.onload = () => {
-    trackPageView(
-      `${window.location.pathname}${window.location.search}${window.location.hash}`
-    );
-  };
   document.head.appendChild(script);
 }
 
 export function trackPageView(path: string) {
-  const measurementId = getGaMeasurementId();
-  if (!measurementId || typeof window.gtag !== "function") return;
+  if (!getGaMeasurementId() || typeof window.gtag !== "function") return;
 
-  // GA4 recommended SPA approach — updates page_path on each route change.
-  window.gtag("config", measurementId, {
+  // With send_page_view disabled, GA4 requires explicit page_view events.
+  window.gtag("event", "page_view", {
     page_path: path,
     page_location: window.location.href,
     page_title: document.title,
