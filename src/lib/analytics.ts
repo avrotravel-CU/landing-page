@@ -1,11 +1,20 @@
 declare global {
   interface Window {
-    dataLayer: unknown[];
-    gtag: (...args: unknown[]) => void;
+    dataLayer: IArguments[];
+    gtag: Gtag;
   }
 }
 
+type Gtag = {
+  (...args: unknown[]): void;
+  (command: "js", date: Date): void;
+  (command: "config", targetId: string, params?: Record<string, unknown>): void;
+  (command: "event", eventName: string, params?: Record<string, unknown>): void;
+};
+
 let initialized = false;
+let gtagReady = false;
+let pendingPageView: string | null = null;
 
 export function getGaMeasurementId() {
   return import.meta.env.VITE_GA_MEASUREMENT_ID?.trim() ?? "";
@@ -15,15 +24,26 @@ export function isGoogleAnalyticsConfigured() {
   return Boolean(getGaMeasurementId());
 }
 
+function sendPageView(path: string) {
+  window.gtag("event", "page_view", {
+    page_path: path,
+    page_location: window.location.href,
+    page_title: document.title,
+  });
+}
+
 export function initGoogleAnalytics() {
   const measurementId = getGaMeasurementId();
   if (!measurementId || initialized) return;
 
   initialized = true;
   window.dataLayer = window.dataLayer || [];
-  window.gtag = function gtag(...args: unknown[]) {
-    window.dataLayer.push(args);
-  };
+
+  // Match Google's snippet — push the Arguments object, not a spread array.
+  window.gtag = function gtag() {
+    // eslint-disable-next-line prefer-rest-params
+    window.dataLayer.push(arguments);
+  } as Gtag;
 
   window.gtag("js", new Date());
   window.gtag("config", measurementId, { send_page_view: false });
@@ -31,18 +51,25 @@ export function initGoogleAnalytics() {
   const script = document.createElement("script");
   script.async = true;
   script.src = `https://www.googletagmanager.com/gtag/js?id=${measurementId}`;
+  script.onload = () => {
+    gtagReady = true;
+    if (pendingPageView !== null) {
+      sendPageView(pendingPageView);
+      pendingPageView = null;
+    }
+  };
   document.head.appendChild(script);
 }
 
 export function trackPageView(path: string) {
   if (!getGaMeasurementId() || typeof window.gtag !== "function") return;
 
-  // With send_page_view disabled, GA4 requires explicit page_view events.
-  window.gtag("event", "page_view", {
-    page_path: path,
-    page_location: window.location.href,
-    page_title: document.title,
-  });
+  if (!gtagReady) {
+    pendingPageView = path;
+    return;
+  }
+
+  sendPageView(path);
 }
 
 export function trackEvent(
