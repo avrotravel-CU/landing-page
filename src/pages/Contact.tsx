@@ -1,5 +1,11 @@
 import { useState, type FormEvent } from "react";
 import { Phone, Mail, MapPin, Clock, Send } from "lucide-react";
+import {
+  SITE_ADDRESS,
+  SITE_EMAIL,
+  SITE_PHONE,
+  SITE_SALES_EMAIL,
+} from "../lib/siteContact";
 
 function FacebookIcon({ size = 16 }: { size?: number }) {
   return (
@@ -51,17 +57,22 @@ const CONTACT_DETAILS = [
   {
     icon: Phone,
     label: "Phone / WhatsApp",
-    value: "+94776718241",
+    value: SITE_PHONE,
   },
   {
     icon: Mail,
     label: "Email",
-    value: "hello@ceylonunscripted.com",
+    value: SITE_EMAIL,
+  },
+  {
+    icon: Mail,
+    label: "Sales",
+    value: SITE_SALES_EMAIL,
   },
   {
     icon: MapPin,
     label: "Address",
-    value: "Dambuwa Watta, Imbulgoda, Gampaha",
+    value: SITE_ADDRESS,
   },
   {
     icon: Clock,

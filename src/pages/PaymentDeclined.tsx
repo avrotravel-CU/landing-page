@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { XCircle, Mail, Phone, RefreshCw, CreditCard } from "lucide-react";
+import { SITE_PHONE } from "../lib/siteContact";
 import type { PaymentResultState } from "../types/payment";
 
 const DECLINE_REASONS = [
@@ -110,7 +111,7 @@ export default function PaymentDeclined() {
               </p>
               <p className="flex items-center gap-2">
                 <Phone size={14} className="text-gold-500" />
-                +94 11 234 5678
+                {SITE_PHONE}
               </p>
             </div>
             <p className="mt-4 text-xs text-forest-950/50">

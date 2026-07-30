@@ -23,6 +23,7 @@ import {
 } from "../data/privacyStatement";
 import { getPlanPrefillFromPackage } from "../lib/tourPackagePrefill";
 import { SITE_NAME, SITE_TAGLINE } from "../lib/siteBranding";
+import { SITE_ADDRESS, SITE_EMAIL, SITE_PHONE } from "../lib/siteContact";
 
 function parseDateOnly(value: string): Date | null {
   const [year, month, day] = value.split("-").map(Number);
@@ -1519,15 +1520,15 @@ export default function Plan() {
                   <div className="mt-5 space-y-2.5 text-sm text-forest-950/70">
                     <p className="flex items-center gap-2">
                       <Phone size={14} className="text-gold-500" />
-                      +94 11 234 5678
+                      {SITE_PHONE}
                     </p>
                     <p className="flex items-center gap-2">
                       <Mail size={14} className="text-gold-500" />
-                      hello@ceylonunscripted.com
+                      {SITE_EMAIL}
                     </p>
                     <p className="flex items-center gap-2">
                       <MapPin size={14} className="text-gold-500" />
-                      Colombo 03, Sri Lanka
+                      {SITE_ADDRESS}
                     </p>
                   </div>
                 </div>
