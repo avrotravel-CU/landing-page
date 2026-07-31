@@ -3,12 +3,12 @@
   "short_name": "Ceylon Unscripted",
   "icons": [
     {
-      "src": "/ceylon-shell-icon.png?v=5",
+      "src": "/ceylon-shell-icon.png?v=7",
       "sizes": "256x256",
       "type": "image/png"
     },
     {
-      "src": "/favicon-512.png?v=5",
+      "src": "/favicon-512.png?v=7",
       "sizes": "512x512",
       "type": "image/png"
     }
