@@ -62,15 +62,15 @@ export const PAYMENT_TERMS_SECTIONS: TermsSection[] = [
       },
       {
         label: "60 to 89 days before travel",
-        text: "50% refund.",
+        text: "75% refund.",
       },
       {
         label: "30 to 59 days before travel",
-        text: "25% refund.",
+        text: "60% refund.",
       },
       {
         label: "Less than 30 days before travel",
-        text: "No refund.",
+        text: "45% refund.",
       },
     ],
     paragraphs: [

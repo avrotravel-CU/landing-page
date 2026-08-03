@@ -52,7 +52,7 @@ const FAQS = [
   },
   {
     q: "What is your cancellation and refund policy?",
-    a: "Cancellations 90+ days before travel receive a full refund minus 10% admin fee. 60 to 89 days: 50% refund. 30 to 59 days: 25% refund. Less than 30 days: no refund. We recommend travel insurance.",
+    a: "Cancellations 90+ days before travel receive a full refund minus 10% admin fee. 60 to 89 days: 75% refund. 30 to 59 days: 60% refund. Less than 30 days: 45% refund. We recommend travel insurance.",
   },
   {
     q: "Are there any additional fees or charges?",
