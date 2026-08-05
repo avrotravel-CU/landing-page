@@ -11,8 +11,6 @@ import avatarJames from "../assets/testimonials/avatar_james.jpg";
 import avatarMariaCarlos from "../assets/testimonials/avatar_maria_carlos.jpg";
 import avatarPatel from "../assets/testimonials/avatar_patel.jpg";
 
-import sarahCooking1 from "../assets/testimonials/reviews/sarah_cooking_1.jpg";
-import sarahCooking2 from "../assets/testimonials/reviews/sarah_cooking_2.jpg";
 import jamesElephants1 from "../assets/testimonials/reviews/james_elephants_1.jpg";
 import jamesElephants2 from "../assets/testimonials/reviews/james_elephants_2.jpg";
 import mariaAdamsPeak1 from "../assets/testimonials/reviews/maria_adams_peak_1.png";
@@ -38,7 +36,6 @@ export const testimonials: Testimonial[] = [
     name: "Sarah Thompson",
     location: "Melbourne, Australia",
     visited: "November 2025",
-    photos: [sarahCooking1, sarahCooking2],
     quote:
       "The cooking class in a local home was absolutely unforgettable. Learning to make hoppers from scratch while hearing stories about family recipes passed down generations, that's the real Ceylon. Our host treated us like family, not tourists.",
     rating: 5,
