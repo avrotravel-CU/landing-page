@@ -6,6 +6,7 @@ import {
   SITE_PHONE,
   SITE_SALES_EMAIL,
 } from "../lib/siteContact";
+import { SITE_REBRAND_NOTE } from "../lib/siteBranding";
 
 function FacebookIcon({ size = 16 }: { size?: number }) {
   return (
@@ -143,6 +144,10 @@ export default function Contact() {
                   </div>
                 ))}
               </div>
+
+              <p className="mt-6 text-sm leading-relaxed text-forest-950/65">
+                {SITE_REBRAND_NOTE}
+              </p>
 
               <div className="mt-7 rounded-xl bg-peach-100 p-5">
                 <h3 className="text-sm font-bold text-forest-900">

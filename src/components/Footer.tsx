@@ -1,4 +1,4 @@
-import { SITE_NAME } from "../lib/siteBranding";
+import { SITE_LEGAL_NAME, SITE_NAME } from "../lib/siteBranding";
 
 const INSTAGRAM_URL = "https://www.instagram.com/ceylon.unscripted/";
 
@@ -15,7 +15,7 @@ export default function Footer() {
           Follow {SITE_NAME} on Instagram
         </a>
         <p className="mt-3 text-xs text-forest-950/50">
-          © {new Date().getFullYear()} {SITE_NAME}. All rights reserved.
+          © {new Date().getFullYear()} {SITE_LEGAL_NAME}. All rights reserved.
         </p>
       </div>
     </footer>
