@@ -121,11 +121,13 @@ export default function Experiences() {
                 key={exp.name}
                 className="overflow-hidden rounded-xl border border-gold-100 bg-white shadow-sm transition hover:shadow-md"
               >
-                <img
-                  src={exp.image}
-                  alt={exp.name}
-                  className="h-44 w-full object-cover"
-                />
+                <div className="aspect-[724/327] w-full overflow-hidden bg-forest-900/5">
+                  <img
+                    src={exp.image}
+                    alt={exp.name}
+                    className="block h-full w-full object-cover"
+                  />
+                </div>
                 <div className="p-4">
                   <span
                     className={`inline-block rounded-full px-3 py-1 text-[11px] font-semibold ${categoryBadgeStyles[exp.category]}`}
