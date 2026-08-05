@@ -16,7 +16,6 @@ import jamesElephants2 from "../assets/testimonials/reviews/james_elephants_2.jp
 import mariaAdamsPeak1 from "../assets/testimonials/reviews/maria_adams_peak_1.png";
 import mariaAdamsPeak2 from "../assets/testimonials/reviews/maria_adams_peak_2.png";
 import patelAyurveda1 from "../assets/testimonials/reviews/patel_ayurveda_1.jpg";
-import patelAyurveda2 from "../assets/testimonials/reviews/patel_ayurveda_2.jpg";
 
 export type Testimonial = {
   name: string;
@@ -68,7 +67,7 @@ export const testimonials: Testimonial[] = [
     location: "Toronto, Canada",
     visited: "June 2025",
     avatar: avatarPatel,
-    photos: [patelAyurveda1, patelAyurveda2],
+    photos: [patelAyurveda1],
     quote:
       "The Ayurveda retreat was exactly what we needed after months of stress. Authentic treatments using traditional methods, herbal oils prepared fresh daily, and therapists who truly understood healing. We left feeling renewed, body and soul.",
     rating: 5,
