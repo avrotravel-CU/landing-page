@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import CustomerReviewsSection from "../components/CustomerReviewsSection";
 import ShareYourStory from "../components/ShareYourStory";
-import { formatReviewLocation } from "../lib/reviewLocation";
+import { fetchCustomerReviews } from "../lib/fetchCustomerReviews";
 import {
   experiences,
   experienceCategories,
@@ -11,51 +11,56 @@ import {
   type ExperienceCategory,
 } from "../data/experiences";
 import { testimonials, type Testimonial } from "../data/testimonials";
-import type { CustomerReview } from "../types/review";
-
-function mapCustomerReview(r: CustomerReview): Testimonial {
-  return {
-    id: r.id,
-    name: r.name,
-    location: formatReviewLocation(r.town, r.country, r.location),
-    visited: r.visited.trim(),
-    quote: r.quote,
-    rating: r.rating,
-    photos: r.photos,
-    submittedAt: r.submittedAt,
-    verified: true,
-  };
-}
 
 export default function Experiences() {
   const [active, setActive] = useState<ExperienceCategory | "All">("All");
   const [customerReviews, setCustomerReviews] = useState<Testimonial[]>([]);
+  const [reviewsLoading, setReviewsLoading] = useState(true);
+  const [reviewsError, setReviewsError] = useState("");
 
   useEffect(() => {
     let cancelled = false;
-    fetch("/api/reviews")
-      .then((res) => res.json())
-      .then((data: { reviews?: CustomerReview[] }) => {
+
+    fetchCustomerReviews()
+      .then(({ reviews, error }) => {
         if (cancelled) return;
-        setCustomerReviews(
-          data.reviews?.length ? data.reviews.map(mapCustomerReview) : []
+        setCustomerReviews(reviews);
+        setReviewsError(error ?? "");
+      })
+      .catch((err: unknown) => {
+        if (cancelled) return;
+        console.error("Failed to load customer reviews:", err);
+        setCustomerReviews([]);
+        setReviewsError(
+          err instanceof Error ? err.message : "Could not load reviews from Google Sheets."
         );
       })
-      .catch(() => {});
+      .finally(() => {
+        if (!cancelled) setReviewsLoading(false);
+      });
+
     return () => {
       cancelled = true;
     };
   }, []);
 
   function refreshReviews() {
-    fetch("/api/reviews")
-      .then((res) => res.json())
-      .then((data: { reviews?: CustomerReview[] }) => {
-        setCustomerReviews(
-          data.reviews?.length ? data.reviews.map(mapCustomerReview) : []
+    setReviewsLoading(true);
+    setReviewsError("");
+
+    fetchCustomerReviews()
+      .then(({ reviews, error }) => {
+        setCustomerReviews(reviews);
+        setReviewsError(error ?? "");
+      })
+      .catch((err: unknown) => {
+        console.error("Failed to refresh customer reviews:", err);
+        setCustomerReviews([]);
+        setReviewsError(
+          err instanceof Error ? err.message : "Could not load reviews from Google Sheets."
         );
       })
-      .catch(() => {});
+      .finally(() => setReviewsLoading(false));
   }
 
   const displayedReviews = [...customerReviews, ...testimonials];
@@ -145,6 +150,24 @@ export default function Experiences() {
           <h2 className="font-serif text-2xl font-bold text-forest-900 sm:text-3xl">
             Customer Reviews
           </h2>
+
+          {reviewsLoading && (
+            <p className="mt-4 text-sm text-forest-950/60">Loading traveler reviews…</p>
+          )}
+
+          {!reviewsLoading && reviewsError && customerReviews.length === 0 && (
+            <p className="mt-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+              Traveler reviews from Google Sheets could not be loaded. Curated reviews are shown
+              below. ({reviewsError})
+            </p>
+          )}
+
+          {!reviewsLoading && !reviewsError && customerReviews.length > 0 && (
+            <p className="mt-2 text-sm text-forest-950/55">
+              Including {customerReviews.length} verified review
+              {customerReviews.length === 1 ? "" : "s"} from our travelers.
+            </p>
+          )}
 
           <CustomerReviewsSection reviews={displayedReviews} />
 

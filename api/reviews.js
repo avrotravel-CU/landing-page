@@ -9,7 +9,11 @@ export default async function handler(req, res) {
   const scriptUrl = process.env.GOOGLE_APPS_SCRIPT_URL;
   const sharedSecret = process.env.GOOGLE_APPS_SCRIPT_SECRET;
   if (!scriptUrl || !sharedSecret) {
-    return res.status(200).json({ reviews: [] });
+    console.error("reviews: missing GOOGLE_APPS_SCRIPT_URL or GOOGLE_APPS_SCRIPT_SECRET");
+    return res.status(503).json({
+      reviews: [],
+      error: "Reviews service is not configured.",
+    });
   }
 
   try {
@@ -31,14 +35,21 @@ export default async function handler(req, res) {
     }
 
     if (!scriptResponse.ok || !parsed || parsed.ok !== true) {
-      console.error("listReviews Apps Script error:", scriptResponse.status, text);
-      return res.status(200).json({ reviews: [] });
+      console.error("listReviews Apps Script error:", scriptResponse.status, text.slice(0, 500));
+      return res.status(502).json({
+        reviews: [],
+        error: "Could not load reviews from Google Sheets.",
+      });
     }
 
+    const reviews = Array.isArray(parsed.reviews) ? parsed.reviews : [];
     res.setHeader("Cache-Control", "s-maxage=60, stale-while-revalidate=300");
-    return res.status(200).json({ reviews: parsed.reviews ?? [] });
+    return res.status(200).json({ reviews });
   } catch (err) {
     console.error("reviews error:", err);
-    return res.status(200).json({ reviews: [] });
+    return res.status(502).json({
+      reviews: [],
+      error: "Reviews service temporarily unavailable.",
+    });
   }
 }

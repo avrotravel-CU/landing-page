@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ChevronDown, ChevronLeft, ChevronRight, Search, Star } from "lucide-react";
 import type { Testimonial } from "../data/testimonials";
+import { filterReviewPhotos } from "../lib/reviewPhotoDisplay";
 import ReviewPhoto from "./ReviewPhoto";
 
 const PAGE_SIZE = 5;
@@ -74,7 +75,7 @@ function CustomerPhotosCarousel({ reviews }: { reviews: Testimonial[] }) {
   const photos = useMemo(
     () =>
       reviews.flatMap((r) =>
-        (r.photos ?? []).slice(0, 3).map((src, i) => ({
+        filterReviewPhotos(r.photos).slice(0, 3).map((src, i) => ({
           src,
           alt: `${r.name}, photo ${i + 1}`,
           key: `${r.id ?? r.name}-${i}`,
@@ -223,7 +224,13 @@ export default function CustomerReviewsSection({ reviews }: Props) {
     setVisibleCount(PAGE_SIZE);
   }, [keyword, sort, reviews.length]);
 
-  if (!summary) return null;
+  if (!summary) {
+    return (
+      <p className="mt-6 text-sm text-forest-950/60">
+        No reviews to display yet. Share your story below to be the first.
+      </p>
+    );
+  }
 
   const rounded = Math.round(summary.average * 10) / 10;
   const visible = filteredSorted.slice(0, visibleCount);
