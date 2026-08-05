@@ -115,20 +115,20 @@ export default function Experiences() {
             ))}
           </div>
 
-          <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 lg:items-stretch">
             {filtered.map((exp) => (
               <div
                 key={exp.name}
-                className="overflow-hidden rounded-xl border border-gold-100 bg-white shadow-sm transition hover:shadow-md"
+                className="flex h-full flex-col overflow-hidden rounded-xl border border-gold-100 bg-white shadow-sm transition hover:shadow-md"
               >
-                <div className="aspect-[724/327] w-full overflow-hidden bg-forest-900/5">
+                <div className="relative h-44 w-full shrink-0 overflow-hidden bg-forest-900/5">
                   <img
                     src={exp.image}
                     alt={exp.name}
-                    className="block h-full w-full object-cover"
+                    className="absolute inset-0 h-full w-full object-cover"
                   />
                 </div>
-                <div className="p-4">
+                <div className="flex flex-1 flex-col p-4">
                   <span
                     className={`inline-block rounded-full px-3 py-1 text-[11px] font-semibold ${categoryBadgeStyles[exp.category]}`}
                   >
