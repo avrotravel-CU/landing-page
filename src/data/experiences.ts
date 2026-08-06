@@ -92,11 +92,11 @@ export const experiences: Experience[] = [
       "Authentic Ayurvedic treatments, oil massages, herbal baths and Panchakarma therapies.",
   },
   {
-    name: "Herbal Garden Walk",
+    name: "Spice Gardens",
     category: "Wellness",
     image: herbalGarden,
     description:
-      "Guided walk through a traditional Ayurvedic garden learning plant medicine.",
+      "Guided walk through lush spice gardens learning cinnamon, pepper, and traditional plant medicine.",
   },
   {
     name: "Street Food Tour, Colombo",
